@@ -1,99 +1,96 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import useToken from "../hooks/useToken";
-
-type User = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  role: string; 
-};
+import { api, User } from "../services/api";
 
 function Signup() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+  const [errorMessage, setErrorMessage] = useState("");
   const { setToken } = useToken();
   const navigate = useNavigate();
 
-  // Función para verificar la seguridad de la contraseña
-  function isPasswordSecure(password: string): boolean {
-    return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  async function handleRegister() {
-    // Validaciones de los campos
-    if (firstName.length <= 6) {
-      alert("First name must be longer than 6 characters.");
-      return;
-    }
-    if (lastName.length <= 6) {
-      alert("Last name must be longer than 6 characters.");
-      return;
-    }
-    if (!email.includes("@") || !email.endsWith(".com")) {
-      alert("Please enter a valid email address.");
-      return;
-    }
-    if (!isPasswordSecure(password)) {
-      alert("Password must be at least 8 characters long and include a number and an uppercase letter.");
+  const validateForm = () => {
+    const { firstName, lastName, email, password } = formData;
+    if (!firstName || !lastName || !email || !password) return "Todos los campos son obligatorios.";
+    if (password.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+    if (!/\S+@\S+\.\S+/.test(email)) return "Introduce un correo válido.";
+    return "";
+  };
+
+  const handleRegister = async () => {
+    const error = validateForm();
+    if (error) {
+      setErrorMessage(error);
       return;
     }
 
-    const user: User = { 
-      firstName, 
-      lastName, 
-      email, 
-      password, 
-      role: "user" 
-    };
-    
     try {
-      const res = await axios.post("http://localhost:8080/auth/register", user);
-      setToken(res.data.token);
-      navigate("/profile");
-    } catch (error: unknown) {
+      const res = await api.register({ ...formData, role: "user" });
+      setToken({ token: res.token, role: res.role });
+      navigate("/dashboard");
+    } catch (error) {
       console.error(error);
-      alert("Error during registration, please check your information.");
+      setErrorMessage("Error al registrarse. Intenta de nuevo más tarde.");
     }
-  }
+  };
 
   return (
-    <div className="flex flex-col space-y-5 max-w-md mx-auto">
-      <h1 className="text-xl text-center">Sign up</h1>
-      <input
-        className="outline rounded p-2"
-        placeholder="First Name"
-        onChange={(e) => setFirstName(e.target.value)}
-      />
-      <input
-        className="outline rounded p-2"
-        placeholder="Last Name"
-        onChange={(e) => setLastName(e.target.value)}
-      />
-      <input
-        className="outline rounded p-2"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        className="outline rounded p-2"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button className="text-blue-500 hover:text-blue-400" onClick={handleRegister}>
-        Sign up
-      </button>
-      <button
-        className="text-blue-500 hover:text-blue-400 text-sm"
-        onClick={() => navigate("/")}
-      >
-        Already have an account? Log in
-      </button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-4">Crear Cuenta</h1>
+        {errorMessage && <p className="text-red-500 text-sm mb-4">{errorMessage}</p>}
+        <input
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleInputChange}
+          className="w-full mb-4 p-2 border rounded"
+          placeholder="Nombre"
+        />
+        <input
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleInputChange}
+          className="w-full mb-4 p-2 border rounded"
+          placeholder="Apellido"
+        />
+        <input
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          className="w-full mb-4 p-2 border rounded"
+          placeholder="Correo Electrónico"
+        />
+        <input
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          className="w-full mb-4 p-2 border rounded"
+          placeholder="Contraseña"
+        />
+        <button
+          className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-400"
+          onClick={handleRegister}
+        >
+          Registrarse
+        </button>
+        <button
+          className="w-full text-blue-500 hover:text-blue-400 text-sm mt-2"
+          onClick={() => navigate("/")}
+        >
+          ¿Ya tienes cuenta? Inicia Sesión
+        </button>
+      </div>
     </div>
   );
 }
