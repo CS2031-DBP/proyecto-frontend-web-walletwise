@@ -55,8 +55,9 @@ export interface PresupuestoDto {
   gastoActual: number;
   periodo: "MENSUAL" | "ANUAL" | "SEMANAL";
   categoriaId: number;
-  categoriaNombre?: string; // Opcional para mostrar el nombre de la categoría
+  categoriaNombre?: string; // Este campo se agrega dinámicamente
 }
+
 
 
 export const api = {
@@ -176,6 +177,9 @@ getAccounts: async (token: string) => {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
+
+  /////
+
 
   getBudgets: async (token: string): Promise<PresupuestoDto[]> => {
     const response = await axios.get(`${API_URL}/api/presupuestos/mispresupuestos`, {
