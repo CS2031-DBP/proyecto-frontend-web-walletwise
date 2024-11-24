@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Button from "../components/Button"; // Importar el componente Button
+import Button from "../components/Button"; // Asegúrate de que esto esté correctamente importado
 
 function Home() {
   const navigate = useNavigate();
@@ -79,8 +79,9 @@ function Home() {
           funcionalidades.
         </p>
         <div className="space-x-4">
+          {/* Cambiar la navegación a '/signup' */}
           <Button
-            label="Crear Cuenta"
+            label="Registrarse"
             onClick={() => navigate("/signup")}
             type="primary"
           />
