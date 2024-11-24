@@ -5,7 +5,7 @@ import useToken from "../hooks/useToken";
 function CrearCategoria() {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [tipo, setTipo] = useState<"Ingreso" | "Gasto">("Ingreso");
+  const [tipo, setTipo] = useState<"INGRESO" | "GASTO">("INGRESO");
   const { token } = useToken();
 
   async function handleCrearCategoria() {
@@ -13,17 +13,18 @@ function CrearCategoria() {
       alert("Por favor, completa todos los campos.");
       return;
     }
-
+  
     const nuevaCategoria: CategoriaDto = { nombre, descripcion, tipo };
-
+    console.log("Categoría a enviar:", nuevaCategoria); // Verificar el contenido
+  
     try {
-      await api.crearCategoria(nuevaCategoria, token || "");
+      await api.createCategory(nuevaCategoria, token || ""); // Cambiar crearCategoria por createCategory
       alert("Categoría creada exitosamente.");
-    } catch (error: unknown) {
-      console.error(error);
+    } catch (error) {
+      console.error("Error al crear la categoría:", error);
       alert("Error al crear la categoría.");
     }
-  }
+  }    
 
   return (
     <div className="max-w-md mx-auto space-y-4">
@@ -41,7 +42,7 @@ function CrearCategoria() {
       <select
         className="outline rounded p-2 w-full"
         value={tipo}
-        onChange={(e) => setTipo(e.target.value as "Ingreso" | "Gasto")}
+        onChange={(e) => setTipo(e.target.value as "INGRESO" | "GASTO")}
       >
         <option value="Ingreso">Ingreso</option>
         <option value="Gasto">Gasto</option>

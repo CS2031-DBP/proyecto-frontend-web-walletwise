@@ -30,7 +30,7 @@ export interface Account {
 export interface CategoriaDto {
   nombre: string;
   descripcion: string;
-  tipo: 'Ingreso' | 'Gasto'; // Enum restringido
+  tipo: 'INGRESO' | 'GASTO'; // Enum restringido
 }
 export interface CreateAccountDto {
   nombre: string;
@@ -50,14 +50,6 @@ export const api = {
     return response.data;
   },
 
-  // Método para crear categorías
-  crearCategoria: async (categoria: CategoriaDto, token: string): Promise<void> => {
-    await axios.post(`${API_URL}/api/categorias`, categoria, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Incluir el token de autorización
-      },
-    });
-  },
 
 getAccounts: async (token: string) => {
   console.log("Usando token para getAccounts:", token);

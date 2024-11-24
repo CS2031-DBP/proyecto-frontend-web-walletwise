@@ -13,7 +13,7 @@ function ManageCategories() {
   const [newCategory, setNewCategory] = useState<CategoriaDto>({
     nombre: "",
     descripcion: "",
-    tipo: "Ingreso",
+    tipo: "INGRESO",
   });
   const [editingCategory, setEditingCategory] = useState<CategoriaConId | null>(
     null
@@ -53,7 +53,7 @@ function ManageCategories() {
       } else {
         await api.createCategory(newCategory, token || "");
         alert("Categoría creada.");
-        setNewCategory({ nombre: "", descripcion: "", tipo: "Ingreso" });
+        setNewCategory({ nombre: "", descripcion: "", tipo: "INGRESO" });
       }
       const data = await api.getCategories(token || "");
       setCategories(data); // Actualiza la lista de categorías
