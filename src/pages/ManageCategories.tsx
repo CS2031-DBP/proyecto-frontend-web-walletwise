@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { api, CategoriaDto } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
+import { useNavigate } from "react-router-dom"; 
 
 // Extender el tipo CategoriaDto para incluir id
 interface CategoriaConId extends CategoriaDto {
@@ -10,15 +11,11 @@ interface CategoriaConId extends CategoriaDto {
 
 function ManageCategories() {
   const [categories, setCategories] = useState<CategoriaConId[]>([]);
-  const [newCategory, setNewCategory] = useState<CategoriaDto>({
-    nombre: "",
-    descripcion: "",
-    tipo: "INGRESO",
-  });
-  const [editingCategory, setEditingCategory] = useState<CategoriaConId | null>(
-    null
-  );
+  const [currentCategory, setCurrentCategory] = useState<CategoriaConId | CategoriaDto | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoriaConId | null>(null);
   const { token } = useToken();
+  const navigate = useNavigate(); // Usar useNavigate para redirigir
 
   useEffect(() => {
     async function fetchCategories() {
@@ -32,29 +29,38 @@ function ManageCategories() {
     fetchCategories();
   }, [token]);
 
+  const openModal = (category?: CategoriaConId) => {
+    if (category) {
+      setCurrentCategory(category);
+    } else {
+      setCurrentCategory({ nombre: "", descripcion: "", tipo: "INGRESO" });
+    }
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setCurrentCategory(null);
+    setIsModalOpen(false);
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    if (editingCategory) {
-      setEditingCategory({ ...editingCategory, [name]: value });
-    } else {
-      setNewCategory({ ...newCategory, [name]: value });
-    }
+    setCurrentCategory((prev) => prev ? { ...prev, [name]: value } : null);
   };
-  
 
   const handleSave = async () => {
+    if (!currentCategory) return;
     try {
-      if (editingCategory) {
-        await api.updateCategory(editingCategory.id, editingCategory, token || "");
+      if ('id' in currentCategory) {
+        await api.updateCategory(currentCategory.id, currentCategory, token || "");
         alert("Categoría actualizada.");
-        setEditingCategory(null);
       } else {
-        await api.createCategory(newCategory, token || "");
+        await api.createCategory(currentCategory as CategoriaDto, token || "");
         alert("Categoría creada.");
-        setNewCategory({ nombre: "", descripcion: "", tipo: "INGRESO" });
       }
+      closeModal();
       const data = await api.getCategories(token || "");
       setCategories(data); // Actualiza la lista de categorías
     } catch (error) {
@@ -63,11 +69,13 @@ function ManageCategories() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async () => {
+    if (!categoryToDelete) return;
     try {
-      await api.deleteCategory(id, token || "");
-      setCategories((prev) => prev.filter((cat) => cat.id !== id));
+      await api.deleteCategory(categoryToDelete.id, token || "");
+      setCategories((prev) => prev.filter((cat) => cat.id !== categoryToDelete.id));
       alert("Categoría eliminada.");
+      setCategoryToDelete(null);
     } catch (error) {
       console.error("Error al eliminar la categoría:", error);
       alert("No se pudo eliminar la categoría.");
@@ -76,74 +84,97 @@ function ManageCategories() {
 
   return (
     <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Categorías</h1>
-
-      {/* Formulario para crear o editar */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">
-          {editingCategory ? "Editar Categoría" : "Nueva Categoría"}
-        </h2>
-        <input
-          name="nombre"
-          value={editingCategory?.nombre || newCategory.nombre}
-          onChange={handleInputChange}
-          placeholder="Nombre"
-          className="w-full p-2 border rounded mb-2"
-        />
-        <textarea
-          name="descripcion"
-          value={editingCategory?.descripcion || newCategory.descripcion}
-          onChange={handleInputChange}
-          placeholder="Descripción"
-          className="w-full p-2 border rounded mb-2"
-        />
-        <select
-          name="tipo"
-          value={editingCategory?.tipo || newCategory.tipo}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded mb-2"
-        >
-          <option value="Ingreso">Ingreso</option>
-          <option value="Gasto">Gasto</option>
-        </select>
-        <div className="flex gap-4">
-          <Button
-            label={editingCategory ? "Guardar Cambios" : "Crear Categoría"}
-            onClick={handleSave}
-            type="primary"
-          />
-          {editingCategory && (
-            <Button
-              label="Cancelar"
-              onClick={() => setEditingCategory(null)}
-              type="secondary"
-            />
-          )}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-blue-700">Gestión de Categorías</h1>
+        <div className="flex space-x-4">
+          <Button label="Nueva Categoría" onClick={() => openModal()} type="primary" />
+          {/* Botón para ir al Dashboard */}
+          <Button label="Volver al Dashboard" onClick={() => navigate("/dashboard")} type="secondary" />
         </div>
       </div>
 
       {/* Lista de categorías */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {categories.map((category) => (
-          <div key={category.id} className="p-4 border rounded shadow bg-white">
-            <h3 className="text-lg font-bold">{category.nombre}</h3>
-            <p>{category.descripcion}</p>
-            <p className="text-gray-500">Tipo: {category.tipo}</p>
-            <div className="flex justify-between mt-2">
+          <div key={category.id} className="p-6 border rounded-lg shadow bg-white">
+            <h3 className="text-xl font-bold text-blue-600 mb-2">{category.nombre}</h3>
+            <p className="text-gray-700">{category.descripcion}</p>
+            <p className="text-gray-500 mt-1">Tipo: {category.tipo}</p>
+            <div className="flex justify-end mt-4 space-x-2">
               <Button
                 label="Editar"
-                onClick={() => setEditingCategory(category)}
+                onClick={() => openModal(category)}
                 type="primary"
               />
               <Button
                 label="Eliminar"
-                onClick={() => handleDelete(category.id)}
+                onClick={() => setCategoryToDelete(category)}
                 type="danger"
               />
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modal para crear/editar categoría */}
+      {isModalOpen && currentCategory && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">
+              {('id' in currentCategory) ? "Editar Categoría" : "Nueva Categoría"}
+            </h2>
+            <input
+              name="nombre"
+              value={currentCategory.nombre}
+              onChange={handleInputChange}
+              placeholder="Nombre"
+              className="w-full p-2 border rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <textarea
+              name="descripcion"
+              value={currentCategory.descripcion}
+              onChange={handleInputChange}
+              placeholder="Descripción"
+              className="w-full p-2 border rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <select
+              name="tipo"
+              value={currentCategory.tipo}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="INGRESO">Ingreso</option>
+              <option value="GASTO">Gasto</option>
+            </select>
+            <div className="flex justify-between">
+              <Button label="Cancelar" onClick={closeModal} type="secondary" />
+              <Button
+                label={('id' in currentCategory) ? "Guardar Cambios" : "Crear Categoría"}
+                onClick={handleSave}
+                type="primary"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para eliminar */}
+      {categoryToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <h2 className="text-lg font-bold text-center mb-4">
+              ¿Eliminar Categoría?
+            </h2>
+            <p className="text-center mb-6">
+              ¿Estás seguro de que deseas eliminar la categoría "<span className="font-semibold">{categoryToDelete.nombre}</span>"?
+            </p>
+            <div className="flex justify-around">
+              <Button label="Cancelar" onClick={() => setCategoryToDelete(null)} type="secondary" />
+              <Button label="Eliminar" onClick={handleDelete} type="danger" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
