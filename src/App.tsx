@@ -4,19 +4,31 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import EditAccount from "./pages/EditAccount";
-
+import ManageCategories from "./pages/ManageCategories"; // Importar la página de categorías
+import EditAccount from "./pages/EditAccount"; // Importar la página de edición de cuentas
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Página principal */}
         <Route path="/" element={<Home />} />
+        
+        {/* Autenticación */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        
+        {/* Dashboard principal */}
         <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* Administración */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/edit-account/:id" element={<EditAccount />} /> {/* Nueva ruta */}
+        
+        {/* Gestión de categorías */}
+        <Route path="/categories" element={<ManageCategories />} />
+        
+        {/* Edición de cuentas */}
+        <Route path="/edit-account/:id" element={<EditAccount />} />
       </Routes>
     </BrowserRouter>
   );

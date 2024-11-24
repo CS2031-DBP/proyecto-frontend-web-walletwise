@@ -95,6 +95,33 @@ getAccounts: async (token: string) => {
     });
     return response.data;
   },
-  
+
+  /////
+  getCategories: async (token: string) => {
+    const response = await axios.get(`${API_URL}/api/categorias`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  createCategory: async (category: CategoriaDto, token: string) => {
+    const response = await axios.post(`${API_URL}/api/categorias`, category, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  updateCategory: async (id: number, category: CategoriaDto, token: string) => {
+    const response = await axios.put(`${API_URL}/api/categorias/${id}`, category, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  deleteCategory: async (id: number, token: string) => {
+    await axios.delete(`${API_URL}/api/categorias/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
   
 };
