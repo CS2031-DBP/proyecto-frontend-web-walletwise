@@ -71,23 +71,40 @@ function ManageBudgets() {
       alert("Por favor, selecciona una categoría.");
       return;
     }
-
+  
     try {
       if (currentBudget.id) {
+        // Actualizar presupuesto existente
         await api.updateBudget(currentBudget.id, currentBudget, token || "");
         alert("Presupuesto actualizado.");
       } else {
+        // Crear nuevo presupuesto
         await api.createBudget(currentBudget, token || "");
         alert("Presupuesto creado.");
       }
+  
+      // Obtener presupuestos y categorías actualizados
+      const [updatedBudgets, updatedCategories] = await Promise.all([
+        api.getBudgets(token || ""),
+        api.getCategories(token || ""),
+      ]);
+  
+      const budgetsWithCategoryName = updatedBudgets.map((budget) => ({
+        ...budget,
+        categoriaNombre:
+          updatedCategories.find((category: CategoriaDto) => category.id === budget.categoriaId)?.nombre ||
+          "Sin categoría",
+      }));
+  
+      setBudgets(budgetsWithCategoryName);
+      setCategories(updatedCategories);
       closeModal();
-      const updatedBudgets = await api.getBudgets(token || "");
-      setBudgets(updatedBudgets);
     } catch (error) {
       console.error("Error al guardar el presupuesto:", error);
       alert("No se pudo guardar el presupuesto.");
     }
   };
+  
 
   const handleDelete = async () => {
     if (!budgetToDelete) return;
