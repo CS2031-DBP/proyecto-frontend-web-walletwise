@@ -20,12 +20,15 @@ function Login() {
     const loginDto: LoginDto = { email, password };
     try {
       const res = await api.login(loginDto);
+      console.log("Token recibido:", res.token);
+      console.log("Rol recibido:", res.role);
       setToken({ token: res.token, role: res.role });
       navigate(res.role === "ADMIN" ? "/admin-dashboard" : "/dashboard");
     } catch (error) {
       console.error(error);
       setErrorMessage("Credenciales inválidas. Intenta de nuevo.");
     }
+    
   }
 
   return (

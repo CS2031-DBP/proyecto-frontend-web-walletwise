@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = '/api';
 
 export interface LoginDto {
   email: string;
@@ -58,13 +58,15 @@ export const api = {
       },
     });
   },
-  
-  getAccounts: async (token: string) => {
-    const response = await axios.get(`${API_URL}/api/cuentas`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  },
+
+getAccounts: async (token: string) => {
+  console.log("Usando token para getAccounts:", token);
+  const response = await axios.get(`${API_URL}/api/cuentas/miscuentas`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+},
+
 
   // Eliminar cuenta
   deleteAccount: async (id: number, token: string) => {

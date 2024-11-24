@@ -17,12 +17,13 @@ function useToken() {
   const [role, setRole] = useState(getRole());
 
   const saveToken = (userToken: { token: string; role: string }) => {
+    console.log("Guardando token:", userToken);
     localStorage.setItem("token", JSON.stringify(userToken));
     setToken(userToken.token);
     setRole(userToken.role);
-    // Disparar evento de actualización del token
     window.dispatchEvent(new Event("storage"));
   };
+  
 
   useEffect(() => {
     const syncToken = () => {
