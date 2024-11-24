@@ -39,6 +39,15 @@ export interface CreateAccountDto {
   moneda: string;
 }
 
+export interface SubcategoriaDto {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  categoriaId: number;
+  categoriaNombre?: string; // Nuevo campo
+}
+
+
 export const api = {
   login: async (loginDto: LoginDto): Promise<AuthResponse> => {
     const response = await axios.post(`${API_URL}/auth/login`, loginDto);
@@ -116,4 +125,41 @@ getAccounts: async (token: string) => {
     });
   },
   
+  ///////
+
+  // Crear subcategoría
+  createSubcategory: async (subcategory: SubcategoriaDto, token: string) => {
+    const response = await axios.post(`${API_URL}/api/subcategorias`, subcategory, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Obtener todas las subcategorías
+  getSubcategories: async (token: string): Promise<SubcategoriaDto[]> => {
+    const response = await axios.get(`${API_URL}/api/subcategorias`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Actualizar subcategoría
+  updateSubcategory: async (
+    id: number,
+    subcategory: SubcategoriaDto,
+    token: string
+  ) => {
+    const response = await axios.put(`${API_URL}/api/subcategorias/${id}`, subcategory, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Eliminar subcategoría
+  deleteSubcategory: async (id: number, token: string) => {
+    await axios.delete(`${API_URL}/api/subcategorias/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
 };

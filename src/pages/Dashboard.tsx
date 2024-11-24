@@ -107,7 +107,14 @@ function Dashboard() {
       </header>
 
       {/* Botones de navegación */}
+      
       <section className="py-8 w-full flex justify-center space-x-6">
+        <Button
+  label="Gestionar Subcategorías"
+  onClick={() => navigate("/subcategories")}
+  type="secondary"
+  className="px-6 py-3"
+/>
         <Button
           label="Gestionar Transacciones"
           onClick={() => navigate("/manage-transactions")}
