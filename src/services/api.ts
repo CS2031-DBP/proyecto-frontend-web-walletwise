@@ -27,6 +27,7 @@ export interface Account {
   moneda: string;
 }
 export interface CategoriaDto {
+  id?: number; // Agrega esta línea para incluir el ID de la categoría
   nombre: string;
   descripcion: string;
   tipo: "INGRESO" | "GASTO"; // Enum restringido
@@ -130,10 +131,14 @@ getAccounts: async (token: string) => {
   },
 
   deleteCategory: async (id: number, token: string) => {
+    if (!id) {
+      throw new Error("El ID de la categoría es obligatorio para eliminar.");
+    }
     await axios.delete(`${API_URL}/api/categorias/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
+  
   
   ///////
 

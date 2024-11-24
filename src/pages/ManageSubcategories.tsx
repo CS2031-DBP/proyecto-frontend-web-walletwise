@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { api, SubcategoriaDto } from "../services/api";
+import { api, SubcategoriaDto, CategoriaDto } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
 function ManageSubcategories() {
   const [subcategories, setSubcategories] = useState<SubcategoriaDto[]>([]);
+  const [categories, setCategories] = useState<CategoriaDto[]>([]); // Lista de categorías dinámicas
   const [currentSubcategory, setCurrentSubcategory] = useState<SubcategoriaDto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subcategoryToDelete, setSubcategoryToDelete] = useState<SubcategoriaDto | null>(null);
   const { token } = useToken();
   const navigate = useNavigate();
 
+  // Cargar subcategorías y categorías al iniciar
   useEffect(() => {
-    async function fetchSubcategories() {
+    async function fetchData() {
       try {
-        const data = await api.getSubcategories(token || "");
-        setSubcategories(data);
+        const [subcategoriesData, categoriesData] = await Promise.all([
+          api.getSubcategories(token || ""),
+          api.getCategories(token || ""), // Obtener categorías desde el backend
+        ]);
+        setSubcategories(subcategoriesData);
+        setCategories(categoriesData); // Guardar categorías dinámicas
       } catch (error) {
-        console.error("Error al cargar subcategorías:", error);
+        console.error("Error al cargar datos:", error);
       }
     }
-    fetchSubcategories();
+    fetchData();
   }, [token]);
 
   const openModal = (subcategory?: SubcategoriaDto) => {
@@ -160,8 +166,11 @@ function ManageSubcategories() {
               <option value="" disabled>
                 Selecciona una categoría
               </option>
-              <option value="1">Categoría 1</option>
-              <option value="2">Categoría 2</option>
+              {categories.map((category) => (
+                <option key={category.nombre} value={category.id}>
+                  {category.nombre}
+                </option>
+              ))}
             </select>
             <div className="flex justify-end space-x-4">
               <Button label="Cancelar" onClick={closeModal} type="secondary" />
@@ -206,4 +215,3 @@ function ManageSubcategories() {
 }
 
 export default ManageSubcategories;
-
