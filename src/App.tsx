@@ -7,6 +7,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ManageCategories from "./pages/ManageCategories"; // Importar la página de categorías
 import EditAccount from "./pages/EditAccount"; // Importar la página de edición de cuentas
 import ManageSubcategories from "./pages/ManageSubcategories";
+import ManageBudgets from "./pages/ManageBudgets";
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
 
        {/* Edición de subcategorias */}
         <Route path="/subcategories" element={<ManageSubcategories />} />
+
+        <Route path="/budgets" element={<ManageBudgets />} />
 
       </Routes>
     </BrowserRouter>

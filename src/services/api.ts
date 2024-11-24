@@ -26,12 +26,12 @@ export interface Account {
   tipoCuenta: string;
   moneda: string;
 }
-// Definir el DTO para la categoría
 export interface CategoriaDto {
   nombre: string;
   descripcion: string;
-  tipo: 'INGRESO' | 'GASTO'; // Enum restringido
+  tipo: "INGRESO" | "GASTO"; // Enum restringido
 }
+
 export interface CreateAccountDto {
   nombre: string;
   saldo: number;
@@ -45,6 +45,16 @@ export interface SubcategoriaDto {
   descripcion: string;
   categoriaId: number;
   categoriaNombre?: string; // Nuevo campo
+}
+
+export interface PresupuestoDto {
+  id?: number;
+  montoTotal: number;
+  alerta: string;
+  gastoActual: number;
+  periodo: "MENSUAL" | "ANUAL" | "SEMANAL";
+  categoriaId: number;
+  categoriaNombre?: string; // Opcional para mostrar el nombre de la categoría
 }
 
 
@@ -158,6 +168,33 @@ getAccounts: async (token: string) => {
   // Eliminar subcategoría
   deleteSubcategory: async (id: number, token: string) => {
     await axios.delete(`${API_URL}/api/subcategorias/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  getBudgets: async (token: string): Promise<PresupuestoDto[]> => {
+    const response = await axios.get(`${API_URL}/api/presupuestos/mispresupuestos`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  createBudget: async (budget: PresupuestoDto, token: string): Promise<PresupuestoDto> => {
+    const response = await axios.post(`${API_URL}/api/presupuestos`, budget, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  updateBudget: async (id: number, budget: PresupuestoDto, token: string): Promise<PresupuestoDto> => {
+    const response = await axios.put(`${API_URL}/api/presupuestos/${id}`, budget, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  deleteBudget: async (id: number, token: string): Promise<void> => {
+    await axios.delete(`${API_URL}/api/presupuestos/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },

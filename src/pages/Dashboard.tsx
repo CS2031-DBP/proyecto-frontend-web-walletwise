@@ -109,32 +109,37 @@ function Dashboard() {
       {/* Botones de navegación */}
       
       <section className="py-8 w-full flex justify-center space-x-6">
-        <Button
-  label="Gestionar Subcategorías"
-  onClick={() => navigate("/subcategories")}
-  type="secondary"
-  className="px-6 py-3"
-/>
-        <Button
-          label="Gestionar Transacciones"
-          onClick={() => navigate("/manage-transactions")}
-          type="secondary"
-          className="px-6 py-3"
-        />
-        <Button
-          label="Gestionar Categorías"
-          onClick={() => navigate("/categories")}
-          type="secondary"
-          className="px-6 py-3"
-        />
-        <Button
-          label="Crear Cuenta"
-          onClick={() => setModalOpen(true)}
-          type="primary"
-          className="px-6 py-3"
-        />
-      </section>
-
+  <Button
+    label="Gestionar Subcategorías"
+    onClick={() => navigate("/subcategories")}
+    type="secondary"
+    className="px-6 py-3"
+  />
+  <Button
+    label="Gestionar Transacciones"
+    onClick={() => navigate("/manage-transactions")}
+    type="secondary"
+    className="px-6 py-3"
+  />
+  <Button
+    label="Gestionar Categorías"
+    onClick={() => navigate("/categories")}
+    type="secondary"
+    className="px-6 py-3"
+  />
+  <Button
+    label="Crear Cuenta"
+    onClick={() => setModalOpen(true)}
+    type="primary"
+    className="px-6 py-3"
+  />
+  <Button
+    label="Gestionar Presupuestos"
+    onClick={() => navigate("/budgets")} 
+    type="primary"
+    className="px-6 py-3"
+  />
+</section>
       {/* Cuentas */}
       <section className="flex items-start max-w-6xl mx-auto p-4">
   {/* Lista de cuentas */}
