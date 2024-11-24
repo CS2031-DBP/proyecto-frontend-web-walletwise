@@ -4,6 +4,8 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import EditAccount from "./pages/EditAccount";
+
 
 function App() {
   return (
@@ -14,6 +16,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/edit-account/:id" element={<EditAccount />} /> {/* Nueva ruta */}
       </Routes>
     </BrowserRouter>
   );

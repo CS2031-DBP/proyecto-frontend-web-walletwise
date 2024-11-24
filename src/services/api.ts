@@ -89,5 +89,12 @@ getAccounts: async (token: string) => {
     });
     return response.data;
   },
+  updateAccount: async (id: number, account: CreateAccountDto, token: string) => {
+    const response = await axios.put(`${API_URL}/api/cuentas/${id}`, account, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+  
   
 };

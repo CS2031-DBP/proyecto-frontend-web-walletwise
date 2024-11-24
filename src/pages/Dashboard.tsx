@@ -63,7 +63,7 @@ function Dashboard() {
         },
         token || ""
       );
-  
+
       // Cierra el modal y actualiza la lista de cuentas
       setModalOpen(false);
       setNewAccount({ nombre: "", saldo: 0, tipoCuenta: "AHORRO", moneda: "USD" });
@@ -76,6 +76,17 @@ function Dashboard() {
       } else {
         console.error("Error inesperado:", error);
       }
+    }
+  };
+
+  const handleDeleteAccount = async (id: number) => {
+    try {
+      await api.deleteAccount(id, token || "");
+      setAccounts((prev) => prev.filter((account) => account.id !== id));
+      alert("Cuenta eliminada exitosamente.");
+    } catch (error) {
+      console.error("Error al eliminar cuenta:", error);
+      alert("No se pudo eliminar la cuenta. Intenta de nuevo.");
     }
   };
 
@@ -108,6 +119,18 @@ function Dashboard() {
                   <p className="text-gray-500">
                     <strong>Tipo:</strong> {account.tipoCuenta}
                   </p>
+                  <div className="flex justify-between mt-4">
+                    <Button
+                      label="Editar"
+                      onClick={() => navigate(`/edit-account/${account.id}`)}
+                      type="primary"
+                    />
+                    <Button
+                      label="Eliminar"
+                      onClick={() => handleDeleteAccount(account.id)}
+                      type="danger"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -122,60 +145,68 @@ function Dashboard() {
           </div>
         </>
       )}
-  {isModalOpen && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-      <h2 className="text-xl font-bold mb-4">Crear Nueva Cuenta</h2>
-      <input
-        type="text"
-        placeholder="Nombre de la cuenta"
-        value={newAccount.nombre}
-        onChange={(e) =>
-          setNewAccount((prev) => ({ ...prev, nombre: e.target.value }))
-        }
-        className="w-full p-2 border rounded mb-4"
-      />
-      <input
-        type="number"
-        placeholder="Saldo inicial"
-        value={newAccount.saldo}
-        onChange={(e) =>
-          setNewAccount((prev) => ({
-            ...prev,
-            saldo: parseFloat(e.target.value) || 0,
-          }))
-        }
-        className="w-full p-2 border rounded mb-4"
-      />
-      <select
-        value={newAccount.tipoCuenta}
-        onChange={(e) =>
-          setNewAccount((prev) => ({ ...prev, tipoCuenta: e.target.value }))
-        }
-        className="w-full p-2 border rounded mb-4"
-      >
-        <option value="AHORRO">Ahorro</option>
-        <option value="CORRIENTE">Corriente</option>
-        <option value="INVERSION">Inversión</option>
-      </select>
-      <select
-        value={newAccount.moneda}
-        onChange={(e) =>
-          setNewAccount((prev) => ({ ...prev, moneda: e.target.value }))
-        }
-        className="w-full p-2 border rounded mb-4"
-      >
-        <option value="USD">USD</option>
-        <option value="PEN">PEN</option>
-        <option value="EUR">EUR</option>
-      </select>
-      <div className="flex justify-between">
-        <Button label="Cancelar" onClick={() => setModalOpen(false)} type="secondary" />
-        <Button label="Crear" onClick={handleCreateAccount} type="primary" />
-      </div>
-    </div>
-  </div>
-)}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Crear Nueva Cuenta</h2>
+            <input
+              type="text"
+              placeholder="Nombre de la cuenta"
+              value={newAccount.nombre}
+              onChange={(e) =>
+                setNewAccount((prev) => ({ ...prev, nombre: e.target.value }))
+              }
+              className="w-full p-2 border rounded mb-4"
+            />
+            <input
+              type="number"
+              placeholder="Saldo inicial"
+              value={newAccount.saldo}
+              onChange={(e) =>
+                setNewAccount((prev) => ({
+                  ...prev,
+                  saldo: parseFloat(e.target.value) || 0,
+                }))
+              }
+              className="w-full p-2 border rounded mb-4"
+            />
+            <select
+              value={newAccount.tipoCuenta}
+              onChange={(e) =>
+                setNewAccount((prev) => ({ ...prev, tipoCuenta: e.target.value }))
+              }
+              className="w-full p-2 border rounded mb-4"
+            >
+              <option value="AHORRO">Ahorro</option>
+              <option value="CORRIENTE">Corriente</option>
+              <option value="INVERSION">Inversión</option>
+            </select>
+            <select
+              value={newAccount.moneda}
+              onChange={(e) =>
+                setNewAccount((prev) => ({ ...prev, moneda: e.target.value }))
+              }
+              className="w-full p-2 border rounded mb-4"
+            >
+              <option value="USD">USD</option>
+              <option value="PEN">PEN</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <div className="flex justify-between">
+              <Button
+                label="Cancelar"
+                onClick={() => setModalOpen(false)}
+                type="secondary"
+              />
+              <Button
+                label="Crear"
+                onClick={handleCreateAccount}
+                type="primary"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
