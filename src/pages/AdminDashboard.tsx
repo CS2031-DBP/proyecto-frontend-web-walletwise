@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import useToken from "../hooks/useToken";
+import Header from "../components/Header";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import Footer from "../components/Footer";
+import Alert from "../components/Alert";
 
 function AdminDashboard() {
   const { token, role } = useToken();
@@ -12,24 +17,28 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <div className="bg-gray-100 p-4 rounded shadow">
-        <h2 className="text-xl">Hello Admin!</h2>
-        <p>Here you can manage the system settings and user information.</p>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Header title="Admin Dashboard" />
+      <div className="flex-grow max-w-4xl mx-auto p-4">
+        <Alert
+          message="Acceso exclusivo para administradores."
+          type="info"
+        />
+        <Card title="Hello Admin!">
+          <p>Aquí puedes gestionar la configuración del sistema y la información de los usuarios.</p>
+        </Card>
 
-      {/* Ejemplo de secciones para administradores */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div className="bg-red-100 p-4 rounded shadow">
-          <h3 className="text-lg font-semibold">User Management</h3>
-          <p>View and manage registered users.</p>
-        </div>
-        <div className="bg-yellow-100 p-4 rounded shadow">
-          <h3 className="text-lg font-semibold">System Settings</h3>
-          <p>Configure system preferences and security settings.</p>
+        {/* Ejemplo de secciones para administradores */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <Card title="User Management" className="bg-red-100">
+            <p>Ver y gestionar usuarios registrados.</p>
+          </Card>
+          <Card title="System Settings" className="bg-yellow-100">
+            <p>Configurar preferencias del sistema y ajustes de seguridad.</p>
+          </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import { api, PresupuestoDto, CategoriaDto } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import Card from "../components/Card";
+import Modal from "../components/Modal";
+import InputField from "../components/InputField";
+import TextArea from "../components/TextArea";
+import Select from "../components/Select";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 function ManageBudgets() {
   const [budgets, setBudgets] = useState<PresupuestoDto[]>([]);
@@ -11,16 +18,28 @@ function ManageBudgets() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<PresupuestoDto | null>(null);
   const { token } = useToken();
-  const navigate = useNavigate(); // Instanciar useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       try {
         const [budgetsData, categoriesData] = await Promise.all([
           api.getBudgets(token || ""),
-          api.getCategories(token || ""),
+          api.getCategories(token || "") as Promise<CategoriaDto[]>,
         ]);
-        setBudgets(budgetsData);
+
+        // Mapear los presupuestos para agregar 'categoriaNombre'
+        const budgetsWithCategoryName = budgetsData.map((budget) => {
+          const category = categoriesData.find(
+            (cat: CategoriaDto) => cat.id === budget.categoriaId
+          );
+          return {
+            ...budget,
+            categoriaNombre: category ? category.nombre : "Sin categoría",
+          };
+        });
+
+        setBudgets(budgetsWithCategoryName);
         setCategories(categoriesData);
       } catch (error) {
         console.error("Error al cargar datos:", error);
@@ -94,89 +113,94 @@ function ManageBudgets() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
-        <h1 className="text-3xl font-bold text-blue-600">Gestión de Presupuestos</h1>
-        <div className="flex space-x-4">
+    <div className="min-h-screen flex flex-col">
+      <Header title="Gestión de Presupuestos" />
+      <div className="flex-grow max-w-7xl mx-auto p-6">
+        {/* Botones de acción */}
+        <div className="flex justify-center mb-8 space-x-4">
           <Button label="Nuevo Presupuesto" onClick={() => openModal()} type="primary" />
           <Button
             label="Volver al Dashboard"
-            onClick={() => navigate("/dashboard")} // Navegar al Dashboard
+            onClick={() => navigate("/dashboard")}
             type="secondary"
           />
         </div>
-      </div>
 
-      {/* Lista de presupuestos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {budgets.map((budget) => (
-          <div key={budget.id} className="p-6 bg-white rounded-lg shadow">
-            <h3 className="text-xl font-bold text-blue-600 mb-2">
-              {budget.categoriaNombre || "Sin categoría"}
-            </h3>
-            <p className="text-gray-700">Monto Total: {budget.montoTotal}</p>
-            <p className="text-gray-500">Gasto Actual: {budget.gastoActual}</p>
-            <p className="text-gray-500">Periodo: {budget.periodo}</p>
-            <div className="flex justify-between mt-4">
-              <Button label="Editar" onClick={() => openModal(budget)} type="primary" />
-              <Button
-                label="Eliminar"
-                onClick={() => setBudgetToDelete(budget)}
-                type="danger"
-              />
+        {/* Lista de presupuestos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {budgets.map((budget) => (
+            <div
+              key={budget.id}
+              className="p-6 bg-white border rounded-lg shadow-md flex flex-col justify-between min-h-[200px]"
+            >
+              <div>
+                <h3 className="text-xl font-bold text-blue-600">
+                  {budget.categoriaNombre || "Sin categoría"}
+                </h3>
+                <p className="text-gray-700 mt-2">
+                  <strong>Monto Total:</strong> {budget.montoTotal}
+                </p>
+                <p className="text-gray-500">
+                  <strong>Gasto Actual:</strong> {budget.gastoActual}
+                </p>
+                <p className="text-gray-500">
+                  <strong>Periodo:</strong> {budget.periodo}
+                </p>
+              </div>
+              <div className="flex justify-center space-x-4 mt-4">
+                <Button label="Editar" onClick={() => openModal(budget)} type="primary" />
+                <Button
+                  label="Eliminar"
+                  onClick={() => setBudgetToDelete(budget)}
+                  type="danger"
+                />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Modal para crear/editar presupuesto */}
-      {isModalOpen && currentBudget && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-2xl font-bold mb-4 text-blue-600">
-              {currentBudget.id ? "Editar Presupuesto" : "Nuevo Presupuesto"}
-            </h2>
-            <input
+        {/* Modal para crear/editar presupuesto */}
+        {isModalOpen && currentBudget && (
+          <Modal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            title={currentBudget.id ? "Editar Presupuesto" : "Nuevo Presupuesto"}
+          >
+            <InputField
               name="montoTotal"
+              type="number"
               value={currentBudget.montoTotal}
               onChange={handleInputChange}
               placeholder="Monto Total"
-              type="number"
-              className="w-full p-3 border rounded-lg mb-4"
             />
-            <textarea
+            <TextArea
               name="alerta"
               value={currentBudget.alerta}
               onChange={handleInputChange}
               placeholder="Alerta (opcional)"
-              className="w-full p-3 border rounded-lg mb-4"
             />
-            <select
+            <Select
               name="periodo"
               value={currentBudget.periodo}
               onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            >
-              <option value="MENSUAL">Mensual</option>
-              <option value="ANUAL">Anual</option>
-              <option value="SEMANAL">Semanal</option>
-            </select>
-            <select
+              options={[
+                { value: "MENSUAL", label: "Mensual" },
+                { value: "ANUAL", label: "Anual" },
+                { value: "SEMANAL", label: "Semanal" },
+              ]}
+            />
+            <Select
               name="categoriaId"
               value={currentBudget.categoriaId}
               onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            >
-              <option value="" disabled>
-                Selecciona una categoría
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.nombre}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: "", label: "Selecciona una categoría" },
+                ...categories.map((category) => ({
+                  value: category.id!,
+                  label: category.nombre,
+                })),
+              ]}
+            />
             <div className="flex justify-between space-x-4">
               <Button label="Cancelar" onClick={closeModal} type="secondary" />
               <Button
@@ -185,17 +209,15 @@ function ManageBudgets() {
                 type="primary"
               />
             </div>
-          </div>
-        </div>
-      )}
+          </Modal>
+        )}
 
-      {/* Confirmación de eliminación */}
-      {budgetToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-            <h2 className="text-lg font-bold text-center mb-4">
-              ¿Eliminar Presupuesto?
-            </h2>
+        {/* Confirmación de eliminación */}
+        {budgetToDelete && (
+          <Modal
+            isOpen={!!budgetToDelete}
+            onClose={() => setBudgetToDelete(null)}
+          >
             <p className="text-center mb-6">
               ¿Estás seguro de que deseas eliminar el presupuesto de la categoría{" "}
               <span className="font-semibold">{budgetToDelete.categoriaNombre}</span>?
@@ -208,12 +230,12 @@ function ManageBudgets() {
               />
               <Button label="Eliminar" onClick={handleDelete} type="danger" />
             </div>
-          </div>
-        </div>
-      )}
+          </Modal>
+        )}
+      </div>
+      <Footer />
     </div>
   );
 }
 
 export default ManageBudgets;
-

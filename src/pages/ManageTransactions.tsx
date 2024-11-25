@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { api, CategoriaDto, Account } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
+import Card from "../components/Card";
+import Modal from "../components/Modal";
+import InputField from "../components/InputField";
+import Select from "../components/Select";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface Transaction {
   id?: number;
@@ -120,27 +127,58 @@ function ManageTransactions() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Encabezado */}
-      <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
-        <h1 className="text-3xl font-bold text-blue-600">Gestión de Transacciones</h1>
-        <div className="flex space-x-4">
-          <Button label="Nueva Transacción" onClick={() => openModal()} type="primary" />
-          <Button label="Volver al Dashboard" onClick={() => navigate("/dashboard")} type="secondary" />
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col">
+  <Header title="Gestión de Transacciones" />
+  <div className="flex-grow max-w-7xl mx-auto p-6">
+    {/* Botones de acción centrados */}
+    <div className="flex justify-center space-x-4 mb-6">
+      <Button
+        label="Nueva Transacción"
+        onClick={() => openModal()}
+        type="primary"
+      />
+      <Button
+        label="Volver al Dashboard"
+        onClick={() => navigate("/dashboard")}
+        type="secondary"
+      />
+    </div>
 
-      {/* Lista de transacciones */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {/* Lista de transacciones */}
+    {transactions.length === 0 ? (
+      <p className="text-gray-500">No hay transacciones registradas.</p>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {transactions.map((transaction) => (
-          <div key={transaction.id} className="p-6 bg-white rounded-lg shadow">
-            <h3 className="text-xl font-bold text-blue-600">{transaction.destinatario}</h3>
-            <p className="text-gray-700">Monto: {transaction.monto}</p>
-            <p className="text-gray-500">Fecha: {transaction.fecha}</p>
-            <p className="text-gray-500">Tipo: {transaction.tipo}</p>
-            <div className="flex justify-between mt-4">
-              <Button label="Editar" onClick={() => openModal(transaction)} type="primary" />
-              <Button label="Eliminar" onClick={() => handleDelete(transaction.id!)} type="danger" />
+          <div
+            key={transaction.id}
+            className="p-6 bg-white border rounded-lg shadow-md hover:shadow-lg transition-shadow min-h-[180px] flex flex-col justify-between"
+          >
+            <div>
+              <h3 className="text-xl font-bold text-blue-600">
+                {transaction.destinatario}
+              </h3>
+              <p className="text-gray-700 mt-2">
+                <strong>Monto:</strong> {transaction.monto}
+              </p>
+              <p className="text-gray-500">
+                <strong>Fecha:</strong> {transaction.fecha}
+              </p>
+              <p className="text-gray-500">
+                <strong>Tipo:</strong> {transaction.tipo}
+              </p>
+            </div>
+            <div className="flex justify-between mt-4 space-x-2">
+              <Button
+                label="Editar"
+                onClick={() => openModal(transaction)}
+                type="primary"
+              />
+              <Button
+                label="Eliminar"
+                onClick={() => handleDelete(transaction.id!)}
+                type="danger"
+              />
               <Button
                 label="Items"
                 onClick={() => navigate(`/manage-items/${transaction.id}`)}
@@ -150,99 +188,95 @@ function ManageTransactions() {
           </div>
         ))}
       </div>
+    )}
 
-      {/* Paginación */}
-      <div className="flex justify-center space-x-4 mt-6">
-        <Button
-          label="Anterior"
-          onClick={() => fetchTransactions(pagination.currentPage - 1)}
-          type="secondary"
-          disabled={pagination.currentPage === 0}
-        />
-        <Button
-          label="Siguiente"
-          onClick={() => fetchTransactions(pagination.currentPage + 1)}
-          type="secondary"
-          disabled={pagination.currentPage + 1 >= pagination.totalPages}
-        />
-      </div>
-
-      {/* Modal para crear/editar transacción */}
-      {isModalOpen && currentTransaction && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-2xl font-bold mb-4 text-blue-600">
-              {currentTransaction.id ? "Editar Transacción" : "Nueva Transacción"}
-            </h2>
-            <input
-              name="destinatario"
-              value={currentTransaction.destinatario}
-              onChange={handleInputChange}
-              placeholder="Destinatario"
-              className="w-full p-3 border rounded-lg mb-4"
-            />
-            <input
-              name="monto"
-              type="number"
-              value={currentTransaction.monto}
-              onChange={handleInputChange}
-              placeholder="Monto"
-              className="w-full p-3 border rounded-lg mb-4"
-            />
-            <input
-              name="fecha"
-              type="date"
-              value={currentTransaction.fecha}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            />
-            <select
-              name="tipo"
-              value={currentTransaction.tipo}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            >
-              <option value="GASTO">Gasto</option>
-              <option value="INGRESO">Ingreso</option>
-            </select>
-            <select
-              name="cuentaId"
-              value={currentTransaction.cuentaId}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            >
-              <option value="0" disabled>
-                Selecciona una cuenta
-              </option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.nombre}
-                </option>
-              ))}
-            </select>
-            <select
-              name="categoriaId"
-              value={currentTransaction.categoriaId}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            >
-              <option value="0" disabled>
-                Selecciona una categoría
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.nombre}
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-between">
-              <Button label="Cancelar" onClick={closeModal} type="secondary" />
-              <Button label="Guardar" onClick={handleSave} type="primary" />
-            </div>
-          </div>
-        </div>
-      )}
+    {/* Paginación */}
+    <div className="flex justify-center space-x-4 mt-6">
+      <Button
+        label="Anterior"
+        onClick={() => fetchTransactions(pagination.currentPage - 1)}
+        type="secondary"
+        disabled={pagination.currentPage === 0}
+      />
+      <Button
+        label="Siguiente"
+        onClick={() => fetchTransactions(pagination.currentPage + 1)}
+        type="secondary"
+        disabled={pagination.currentPage + 1 >= pagination.totalPages}
+      />
     </div>
+
+    {/* Modal para crear/editar transacción */}
+    {isModalOpen && currentTransaction && (
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={
+          currentTransaction.id ? "Editar Transacción" : "Nueva Transacción"
+        }
+      >
+        <InputField
+          name="destinatario"
+          value={currentTransaction.destinatario}
+          onChange={handleInputChange}
+          placeholder="Destinatario"
+        />
+        <InputField
+          name="monto"
+          type="number"
+          value={currentTransaction.monto}
+          onChange={handleInputChange}
+          placeholder="Monto"
+        />
+        <InputField
+          name="fecha"
+          type="date"
+          value={currentTransaction.fecha}
+          onChange={handleInputChange}
+        />
+        <Select
+          name="tipo"
+          value={currentTransaction.tipo}
+          onChange={handleInputChange}
+          options={[
+            { value: "GASTO", label: "Gasto" },
+            { value: "INGRESO", label: "Ingreso" },
+          ]}
+        />
+        <Select
+          name="cuentaId"
+          value={currentTransaction.cuentaId}
+          onChange={handleInputChange}
+          options={[
+            { value: "0", label: "Selecciona una cuenta" },
+            ...accounts.map((account) => ({
+              value: account.id,
+              label: account.nombre,
+            })),
+          ]}
+        />
+        <Select
+          name="categoriaId"
+          value={currentTransaction.categoriaId}
+          onChange={handleInputChange}
+          options={[
+            { value: "0", label: "Selecciona una categoría" },
+            ...categories.map((category) => ({
+              value: category.id!,
+              label: category.nombre,
+            })),
+          ]}
+        />
+        <div className="flex justify-between mt-4">
+          <Button label="Cancelar" onClick={closeModal} type="secondary" />
+          <Button label="Guardar" onClick={handleSave} type="primary" />
+        </div>
+      </Modal>
+    )}
+  </div>
+  <Footer />
+</div>
+
   );
 }
 
