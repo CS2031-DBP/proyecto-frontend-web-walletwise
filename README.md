@@ -14,7 +14,7 @@
 - **Gestión de categorías y subcategorías**: Organización de ingresos y gastos por categorías personalizadas.
 - **Gestión de presupuestos**: Configuración de límites financieros por categoría con alertas automáticas.
 - **Gestión de transacciones**: Registro de ingresos y gastos asociados a cuentas y categorías.
-- **Gestión de reportes**: Generación de reportes financieros en múltiples formatos (JSON, PDF, CSV) con detalles de las transacciones.
+- **Gestión de reportes**: Generación de reportes financieros permitiendo elegir entre (JSON, PDF, CSV) con detalles de las transacciones.
 - **Autenticación y roles**: Acceso seguro con autenticación basada en tokens y soporte para roles como administrador y usuario regular.
 
 ---
