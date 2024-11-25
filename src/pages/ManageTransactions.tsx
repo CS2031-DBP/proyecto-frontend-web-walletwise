@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import { api, CategoriaDto, Account } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
@@ -28,15 +29,16 @@ function ManageTransactions() {
     totalPages: 0,
     currentPage: 0,
   });
-  const [accounts, setAccounts] = useState<Account[]>([]); // Lista de cuentas
-  const [categories, setCategories] = useState<CategoriaDto[]>([]); // Lista de categorías
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<CategoriaDto[]>([]);
   const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useToken();
+  const navigate = useNavigate(); // Instanciar useNavigate
 
   useEffect(() => {
-    fetchTransactions(0); // Cargar la primera página de transacciones al inicio
-    fetchAccountsAndCategories(); // Cargar cuentas y categorías
+    fetchTransactions(0);
+    fetchAccountsAndCategories();
   }, [token]);
 
   async function fetchTransactions(page: number) {
@@ -119,11 +121,15 @@ function ManageTransactions() {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
+      {/* Encabezado */}
       <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
         <h1 className="text-3xl font-bold text-blue-600">Gestión de Transacciones</h1>
-        <Button label="Nueva Transacción" onClick={() => openModal()} type="primary" />
+        <div className="flex space-x-4">
+          <Button label="Nueva Transacción" onClick={() => openModal()} type="primary" />
+          <Button label="Volver al Dashboard" onClick={() => navigate("/dashboard")} type="secondary" />
+        </div>
       </div>
-
+  
       {/* Lista de transacciones */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {transactions.map((transaction) => (
@@ -139,7 +145,7 @@ function ManageTransactions() {
           </div>
         ))}
       </div>
-
+  
       {/* Paginación */}
       <div className="flex justify-center space-x-4 mt-6">
         <Button
@@ -155,7 +161,7 @@ function ManageTransactions() {
           disabled={pagination.currentPage + 1 >= pagination.totalPages}
         />
       </div>
-
+  
       {/* Modal para crear/editar transacción */}
       {isModalOpen && currentTransaction && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -233,6 +239,7 @@ function ManageTransactions() {
       )}
     </div>
   );
+  
 }
 
 export default ManageTransactions;
