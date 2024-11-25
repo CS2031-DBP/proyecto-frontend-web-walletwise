@@ -114,6 +114,11 @@ function ManageReports() {
       <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
         <h1 className="text-3xl font-bold text-blue-600">Gestión de Reportes</h1>
         <Button label="Nuevo Reporte" onClick={() => openModal()} type="primary" />
+        <Button
+            label="Volver al Dashboard"
+            onClick={() => navigate("/dashboard")}
+            type="secondary"
+          />
       </div>
 
       {/* Lista de reportes */}
