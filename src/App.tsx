@@ -8,7 +8,7 @@ import ManageCategories from "./pages/ManageCategories"; // Importar la página 
 import EditAccount from "./pages/EditAccount"; // Importar la página de edición de cuentas
 import ManageSubcategories from "./pages/ManageSubcategories";
 import ManageBudgets from "./pages/ManageBudgets";
-
+import ManageTransactions from "./pages/ManageTransactions";
 function App() {
   return (
     <BrowserRouter>
@@ -36,6 +36,9 @@ function App() {
         <Route path="/subcategories" element={<ManageSubcategories />} />
 
         <Route path="/budgets" element={<ManageBudgets />} />
+
+        <Route path="/manage-transactions" element={<ManageTransactions />} />
+
 
       </Routes>
     </BrowserRouter>

@@ -58,6 +58,16 @@ export interface PresupuestoDto {
   categoriaNombre?: string; // Este campo se agrega dinámicamente
 }
 
+// Transacciones
+export interface Transaction {
+  id?: number; // ID opcional para nuevas transacciones
+  monto: number;
+  destinatario: string;
+  fecha: string; // Fecha en formato "YYYY-MM-DD"
+  tipo: "GASTO" | "INGRESO"; // Gasto o ingreso
+  cuentaId: number; // ID de la cuenta asociada
+  categoriaId: number; // ID de la categoría asociada
+}
 
 
 export const api = {
@@ -86,14 +96,6 @@ getAccounts: async (token: string) => {
     await axios.delete(`${API_URL}/api/cuentas/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-  },
-
-  // Obtener transacciones
-  getTransactions: async (token: string) => {
-    const response = await axios.get(`${API_URL}/api/transacciones`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
   },
 
   createAccount: async (account: CreateAccountDto, token: string) => {
@@ -204,6 +206,39 @@ getAccounts: async (token: string) => {
 
   deleteBudget: async (id: number, token: string): Promise<void> => {
     await axios.delete(`${API_URL}/api/presupuestos/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+   // Transacciones
+   getTransactions: async (token: string, page: number): Promise<{
+    totalItems: number;
+    transacciones: Transaction[];
+    totalPages: number;
+    currentPage: number;
+  }> => {
+    const response = await axios.get(`${API_URL}/api/transacciones?page=${page}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  createTransaction: async (transaction: Transaction, token: string): Promise<Transaction> => {
+    const response = await axios.post(`${API_URL}/api/transacciones`, transaction, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  updateTransaction: async (id: number, transaction: Transaction, token: string): Promise<Transaction> => {
+    const response = await axios.put(`${API_URL}/api/transacciones/${id}`, transaction, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  deleteTransaction: async (id: number, token: string): Promise<void> => {
+    await axios.delete(`${API_URL}/api/transacciones/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },

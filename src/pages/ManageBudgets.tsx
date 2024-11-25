@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { api, PresupuestoDto, CategoriaDto } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 
 function ManageBudgets() {
   const [budgets, setBudgets] = useState<PresupuestoDto[]>([]);
@@ -10,8 +11,8 @@ function ManageBudgets() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<PresupuestoDto | null>(null);
   const { token } = useToken();
+  const navigate = useNavigate(); // Instanciar useNavigate
 
-  // Fetch budgets and categories on load
   useEffect(() => {
     async function fetchData() {
       try {
@@ -19,16 +20,7 @@ function ManageBudgets() {
           api.getBudgets(token || ""),
           api.getCategories(token || ""),
         ]);
-  
-        // Asignar nombres de categoría a los presupuestos
-        const budgetsWithCategoryName = budgetsData.map((budget) => ({
-            ...budget,
-            categoriaNombre:
-              categoriesData.find((category: CategoriaDto) => category.id === budget.categoriaId)?.nombre ||
-              "Sin categoría",
-          }));          
-  
-        setBudgets(budgetsWithCategoryName);
+        setBudgets(budgetsData);
         setCategories(categoriesData);
       } catch (error) {
         console.error("Error al cargar datos:", error);
@@ -36,8 +28,6 @@ function ManageBudgets() {
     }
     fetchData();
   }, [token]);
-  
-  
 
   const openModal = (budget?: PresupuestoDto) => {
     setCurrentBudget(
@@ -71,40 +61,23 @@ function ManageBudgets() {
       alert("Por favor, selecciona una categoría.");
       return;
     }
-  
+
     try {
       if (currentBudget.id) {
-        // Actualizar presupuesto existente
         await api.updateBudget(currentBudget.id, currentBudget, token || "");
         alert("Presupuesto actualizado.");
       } else {
-        // Crear nuevo presupuesto
         await api.createBudget(currentBudget, token || "");
         alert("Presupuesto creado.");
       }
-  
-      // Obtener presupuestos y categorías actualizados
-      const [updatedBudgets, updatedCategories] = await Promise.all([
-        api.getBudgets(token || ""),
-        api.getCategories(token || ""),
-      ]);
-  
-      const budgetsWithCategoryName = updatedBudgets.map((budget) => ({
-        ...budget,
-        categoriaNombre:
-          updatedCategories.find((category: CategoriaDto) => category.id === budget.categoriaId)?.nombre ||
-          "Sin categoría",
-      }));
-  
-      setBudgets(budgetsWithCategoryName);
-      setCategories(updatedCategories);
       closeModal();
+      const updatedBudgets = await api.getBudgets(token || "");
+      setBudgets(updatedBudgets);
     } catch (error) {
       console.error("Error al guardar el presupuesto:", error);
       alert("No se pudo guardar el presupuesto.");
     }
   };
-  
 
   const handleDelete = async () => {
     if (!budgetToDelete) return;
@@ -125,7 +98,14 @@ function ManageBudgets() {
       {/* Header */}
       <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
         <h1 className="text-3xl font-bold text-blue-600">Gestión de Presupuestos</h1>
-        <Button label="Nuevo Presupuesto" onClick={() => openModal()} type="primary" />
+        <div className="flex space-x-4">
+          <Button label="Nuevo Presupuesto" onClick={() => openModal()} type="primary" />
+          <Button
+            label="Volver al Dashboard"
+            onClick={() => navigate("/dashboard")} // Navegar al Dashboard
+            type="secondary"
+          />
+        </div>
       </div>
 
       {/* Lista de presupuestos */}
@@ -236,3 +216,4 @@ function ManageBudgets() {
 }
 
 export default ManageBudgets;
+
