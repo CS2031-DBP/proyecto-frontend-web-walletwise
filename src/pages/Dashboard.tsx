@@ -99,108 +99,113 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center">
       {/* Encabezado */}
-      <header className="w-full bg-blue-600 text-white py-10">
+      <header className="w-full bg-blue-600 text-white py-10 relative">
         <div className="text-center">
           <h1 className="text-5xl font-bold">Tu Dashboard</h1>
           <p className="mt-4 text-lg">Gestiona tus cuentas y categorías</p>
         </div>
+        {/* Botón de cerrar sesión */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Cerrar Sesión
+        </button>
       </header>
-
+  
       {/* Botones de navegación */}
-      
       <section className="py-8 w-full flex justify-center space-x-4">
-  <Button
-    label="Gestionar Subcategorías"
-    onClick={() => navigate("/subcategories")}
-    type="secondary"
-    className="px-4 py-2"
-  />
-  <Button
-    label="Gestionar Transacciones"
-    onClick={() => navigate("/manage-transactions")}
-    type="secondary"
-    className="px-4 py-2"
-  />
-  <Button
-    label="Gestionar Categorías"
-    onClick={() => navigate("/categories")}
-    type="secondary"
-    className="px-4 py-2"
-  />
-  <Button
-    label="Crear Cuenta"
-    onClick={() => setModalOpen(true)}
-    type="primary"
-    className="px-4 py-2"
-  />
-  <Button
-    label="Gestionar Presupuestos"
-    onClick={() => navigate("/budgets")}
-    type="primary"
-    className="px-4 py-2"
-  />
-  <Button
-    label="Ver Perfil"
-    onClick={() => navigate("/profile")}
-    type="secondary"
-    className="px-4 py-2"
-  />
-</section>
-
+        <Button
+          label="Gestionar Subcategorías"
+          onClick={() => navigate("/subcategories")}
+          type="secondary"
+          className="px-4 py-2"
+        />
+        <Button
+          label="Gestionar Transacciones"
+          onClick={() => navigate("/manage-transactions")}
+          type="secondary"
+          className="px-4 py-2"
+        />
+        <Button
+          label="Gestionar Categorías"
+          onClick={() => navigate("/categories")}
+          type="secondary"
+          className="px-4 py-2"
+        />
+        <Button
+          label="Crear Cuenta"
+          onClick={() => setModalOpen(true)}
+          type="primary"
+          className="px-4 py-2"
+        />
+        <Button
+          label="Gestionar Presupuestos"
+          onClick={() => navigate("/budgets")}
+          type="primary"
+          className="px-4 py-2"
+        />
+        <Button
+          label="Ver Perfil"
+          onClick={() => navigate("/profile")}
+          type="secondary"
+          className="px-4 py-2"
+        />
+      </section>
+  
       {/* Cuentas */}
       <section className="flex items-start max-w-6xl mx-auto p-4">
-  {/* Lista de cuentas */}
-  <div className="w-2/3">
-    <h2 className="text-3xl font-bold text-blue-700 mb-6">Tus Cuentas</h2>
-    {loading ? (
-      <p className="text-gray-500">Cargando cuentas...</p>
-    ) : accounts.length === 0 ? (
-      <p className="text-gray-500">No tienes cuentas registradas.</p>
-    ) : (
-      <div className="space-y-6">
-        {accounts.map((account) => (
-          <div
-            key={account.id}
-            className="p-6 border rounded-lg shadow-lg bg-white flex justify-between items-center"
-          >
-            <div>
-              <h3 className="text-2xl font-bold text-blue-600">{account.nombre}</h3>
-              <p className="text-gray-700 mt-2">
-                <strong>Saldo:</strong> {account.saldo} {account.moneda}
-              </p>
-              <p className="text-gray-500">
-                <strong>Tipo:</strong> {account.tipoCuenta}
-              </p>
+        {/* Lista de cuentas */}
+        <div className="w-2/3">
+          <h2 className="text-3xl font-bold text-blue-700 mb-6">Tus Cuentas</h2>
+          {loading ? (
+            <p className="text-gray-500">Cargando cuentas...</p>
+          ) : accounts.length === 0 ? (
+            <p className="text-gray-500">No tienes cuentas registradas.</p>
+          ) : (
+            <div className="space-y-6">
+              {accounts.map((account) => (
+                <div
+                  key={account.id}
+                  className="p-6 border rounded-lg shadow-lg bg-white flex justify-between items-center"
+                >
+                  <div>
+                    <h3 className="text-2xl font-bold text-blue-600">{account.nombre}</h3>
+                    <p className="text-gray-700 mt-2">
+                      <strong>Saldo:</strong> {account.saldo} {account.moneda}
+                    </p>
+                    <p className="text-gray-500">
+                      <strong>Tipo:</strong> {account.tipoCuenta}
+                    </p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      label="Editar"
+                      onClick={() => navigate(`/edit-account/${account.id}`)}
+                      type="primary"
+                    />
+                    <Button
+                      label="Eliminar"
+                      onClick={() => setAccountToDelete(account)}
+                      type="danger"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex space-x-2">
-              <Button
-                label="Editar"
-                onClick={() => navigate(`/edit-account/${account.id}`)}
-                type="primary"
-              />
-              <Button
-                label="Eliminar"
-                onClick={() => setAccountToDelete(account)}
-                type="danger"
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-
-  {/* Imagen de billetera */}
-  <div className="w-1/3 flex justify-center">
-    <img
-      src="https://cdn-icons-png.flaticon.com/512/891/891462.png" 
-      alt="Wallet"
-      className="w-2/3"
-    />
-  </div>
-</section>
-
-
+          )}
+        </div>
+  
+        {/* Imagen de billetera */}
+        <div className="w-1/3 flex justify-center">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/891/891462.png"
+            alt="Wallet"
+            className="w-2/3"
+          />
+        </div>
+      </section>
+  
       {/* Modal para crear cuenta */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -255,16 +260,12 @@ function Dashboard() {
                 onClick={() => setModalOpen(false)}
                 type="secondary"
               />
-              <Button
-                label="Crear"
-                onClick={handleCreateAccount}
-                type="primary"
-              />
+              <Button label="Crear" onClick={handleCreateAccount} type="primary" />
             </div>
           </div>
         </div>
       )}
-
+  
       {/* Modal de confirmación */}
       {accountToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -277,13 +278,18 @@ function Dashboard() {
             </p>
             <div className="flex justify-around">
               <Button label="No" onClick={handleCancelDelete} type="secondary" />
-              <Button label="Sí, Eliminar" onClick={handleConfirmDelete} type="danger" />
+              <Button
+                label="Sí, Eliminar"
+                onClick={handleConfirmDelete}
+                type="danger"
+              />
             </div>
           </div>
         </div>
       )}
     </div>
   );
+  
 }
 
 export default Dashboard;

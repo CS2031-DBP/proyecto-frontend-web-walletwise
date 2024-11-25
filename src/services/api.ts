@@ -217,7 +217,7 @@ getAccounts: async (token: string) => {
     totalPages: number;
     currentPage: number;
   }> => {
-    const response = await axios.get(`${API_URL}/api/transacciones?page=${page}`, {
+    const response = await axios.get(`${API_URL}/api/transacciones/mistransacciones?page=${page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
