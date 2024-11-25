@@ -230,6 +230,14 @@ getAccounts: async (token: string) => {
     });
     return response.data;
   },
+  
+  getTransaction: async (token: string, id: number): Promise<Transaction> => {
+    const response = await axios.get(`${API_URL}/api/transacciones/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+  
 
   createTransaction: async (transaction: Transaction, token: string): Promise<Transaction> => {
     const response = await axios.post(`${API_URL}/api/transacciones`, transaction, {

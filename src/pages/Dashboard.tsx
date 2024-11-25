@@ -199,7 +199,7 @@ function Dashboard() {
         {/* Imagen de billetera */}
         <div className="w-1/3 flex justify-center">
           <img
-            src="https://cdn-icons-png.flaticon.com/512/891/891462.png"
+            src="https://media.discordapp.net/attachments/1278415903016489011/1310409478188961812/image-removebg-preview-71.png?ex=67451d6d&is=6743cbed&hm=8d4012622ab6777d0414e02483c3eea2b4cf3301b90629e02d700da3b282acee&=&format=webp&quality=lossless&width=1184&height=804"
             alt="Wallet"
             className="w-2/3"
           />
