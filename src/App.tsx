@@ -4,12 +4,14 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import ManageCategories from "./pages/ManageCategories"; // Importar la página de categorías
-import EditAccount from "./pages/EditAccount"; // Importar la página de edición de cuentas
+import ManageCategories from "./pages/ManageCategories"; 
+import EditAccount from "./pages/EditAccount"; 
 import ManageSubcategories from "./pages/ManageSubcategories";
 import ManageBudgets from "./pages/ManageBudgets";
 import ManageTransactions from "./pages/ManageTransactions";
 import ManageItems from "./pages/ManageItems";
+import ManageReports from "./pages/ManageReports";
+
 function App() {
   return (
     <BrowserRouter>
@@ -41,6 +43,9 @@ function App() {
         <Route path="/manage-transactions" element={<ManageTransactions />} />
 
         <Route path="/manage-items/:transaccionId" element={<ManageItems />} />
+
+        <Route path="/manage-reports" element={<ManageReports />} />
+
 
       </Routes>
     </BrowserRouter>

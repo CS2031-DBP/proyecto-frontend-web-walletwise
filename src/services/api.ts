@@ -77,6 +77,14 @@ export interface Item {
   transaccionId: number; // ID de la transacción asociada
 }
 
+export interface ReportDto {
+  fechaGeneracion?: string; // Se puede generar automáticamente en el backend
+  tipoReporte: "FINANCIERO" | "GASTOS" | "INGRESOS";
+  fechaInicio: string;
+  fechaFin: string;
+  formato: "JSON" | "PDF" | "CSV";
+}
+
 
 export const api = {
   login: async (loginDto: LoginDto): Promise<AuthResponse> => {
@@ -288,6 +296,30 @@ getAccounts: async (token: string) => {
     await axios.delete(`${API_URL}/api/items/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+  },
+
+  // Crear un nuevo reporte
+  createReport: async (report: ReportDto, token: string) => {
+    const response = await axios.post(`${API_URL}/api/reportes`, report, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Obtener todos los reportes del usuario
+  getReports: async (token: string) => {
+    const response = await axios.get(`${API_URL}/api/reportes/misreportes`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Actualizar un reporte (dependiendo de los requisitos)
+  updateReport: async (id: number, report: ReportDto, token: string) => {
+    const response = await axios.put(`${API_URL}/api/reportes/${id}`, report, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
   },
 
 };

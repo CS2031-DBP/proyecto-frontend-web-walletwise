@@ -98,61 +98,80 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center">
-      {/* Encabezado */}
-      <header className="w-full bg-blue-600 text-white py-10 relative">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold">Tu Dashboard</h1>
-          <p className="mt-4 text-lg">Gestiona tus cuentas y categorías</p>
-        </div>
-        {/* Botón de cerrar sesión */}
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Cerrar Sesión
-        </button>
-      </header>
-  
+      {/* Contenedor del logo y encabezado */}
+      <div className="w-full relative">
+        {/* Logo en la esquina superior izquierda */}
+        <img
+          src="URL_DEL_LOGO" // Reemplaza URL_DEL_LOGO con la URL real de tu logo
+          alt="Logo"
+          className="absolute top-2 left-2 h-16"
+        />
+        {/* Encabezado */}
+        <header className="w-full bg-blue-600 text-white py-10 relative">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold">Tu Dashboard</h1>
+            <p className="mt-4 text-lg">Gestiona tus cuentas y categorías</p>
+          </div>
+          {/* Botón de cerrar sesión */}
+          <button
+            onClick={() => navigate("/")}
+            className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Cerrar Sesión
+          </button>
+        </header>
+      </div>
+
       {/* Botones de navegación */}
-      <section className="py-8 w-full flex justify-center space-x-4">
-        <Button
-          label="Gestionar Subcategorías"
-          onClick={() => navigate("/subcategories")}
-          type="secondary"
-          className="px-4 py-2"
-        />
-        <Button
-          label="Gestionar Transacciones"
-          onClick={() => navigate("/manage-transactions")}
-          type="secondary"
-          className="px-4 py-2"
-        />
-        <Button
-          label="Gestionar Categorías"
-          onClick={() => navigate("/categories")}
-          type="secondary"
-          className="px-4 py-2"
-        />
-        <Button
-          label="Crear Cuenta"
-          onClick={() => setModalOpen(true)}
-          type="primary"
-          className="px-4 py-2"
-        />
-        <Button
-          label="Gestionar Presupuestos"
-          onClick={() => navigate("/budgets")}
-          type="primary"
-          className="px-4 py-2"
-        />
-        <Button
-          label="Ver Perfil"
-          onClick={() => navigate("/profile")}
-          type="secondary"
-          className="px-4 py-2"
-        />
+      <section className="py-8 w-full flex flex-col items-center space-y-4">
+        <div className="flex flex-wrap justify-center space-x-4">
+          <Button
+            label="Gestionar Subcategorías"
+            onClick={() => navigate("/subcategories")}
+            type="secondary"
+            className="px-4 py-2"
+          />
+          <Button
+            label="Gestionar Categorías"
+            onClick={() => navigate("/categories")}
+            type="secondary"
+            className="px-4 py-2"
+          />
+          <Button
+            label="Gestionar Transacciones"
+            onClick={() => navigate("/manage-transactions")}
+            type="secondary"
+            className="px-4 py-2"
+          />
+          <Button
+            label="Gestionar Presupuestos"
+            onClick={() => navigate("/budgets")}
+            type="primary"
+            className="px-4 py-2"
+          />
+        </div>
+        <div className="flex flex-wrap justify-center space-x-4">
+          <Button
+            label="Gestionar Reportes"
+            onClick={() => navigate("/manage-reports")}
+            type="primary"
+            className="px-4 py-2"
+          />
+          <Button
+            label="Crear Cuenta"
+            onClick={() => setModalOpen(true)}
+            type="primary"
+            className="px-4 py-2"
+          />
+          <Button
+            label="Ver Perfil"
+            onClick={() => navigate("/profile")}
+            type="secondary"
+            className="px-4 py-2"
+          />
+        </div>
       </section>
-  
+
       {/* Cuentas */}
       <section className="flex items-start max-w-6xl mx-auto p-4">
         {/* Lista de cuentas */}
@@ -195,7 +214,7 @@ function Dashboard() {
             </div>
           )}
         </div>
-  
+
         {/* Imagen de billetera */}
         <div className="w-1/3 flex justify-center">
           <img
@@ -205,7 +224,7 @@ function Dashboard() {
           />
         </div>
       </section>
-  
+
       {/* Modal para crear cuenta */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -265,7 +284,7 @@ function Dashboard() {
           </div>
         </div>
       )}
-  
+
       {/* Modal de confirmación */}
       {accountToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -289,7 +308,7 @@ function Dashboard() {
       )}
     </div>
   );
-  
 }
 
 export default Dashboard;
+
