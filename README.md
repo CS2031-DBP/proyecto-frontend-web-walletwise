@@ -36,7 +36,7 @@
 
 ## **Requisitos previos**
 - Node.js v16+ y npm instalados en tu máquina.
-- Backend corriendo en `http://localhost:8080`.
+- Backend corriendo en ``.
 
 ---
 
