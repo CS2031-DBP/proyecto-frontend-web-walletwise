@@ -69,6 +69,14 @@ export interface Transaction {
   categoriaId: number; // ID de la categoría asociada
 }
 
+export interface Item {
+  id?: number; // ID opcional para nuevos items
+  nombre: string;
+  precio: number;
+  descripcion: string;
+  transaccionId: number; // ID de la transacción asociada
+}
+
 
 export const api = {
   login: async (loginDto: LoginDto): Promise<AuthResponse> => {
@@ -239,6 +247,37 @@ getAccounts: async (token: string) => {
 
   deleteTransaction: async (id: number, token: string): Promise<void> => {
     await axios.delete(`${API_URL}/api/transacciones/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+   // Obtener items asociados a una transacción
+   getItems: async (token: string, transaccionId: number): Promise<Item[]> => {
+    const response = await axios.get(`${API_URL}/api/items?transaccionId=${transaccionId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Crear un nuevo item
+  createItem: async (item: Item, token: string): Promise<Item> => {
+    const response = await axios.post(`${API_URL}/api/items`, item, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Actualizar un item existente
+  updateItem: async (id: number, item: Item, token: string): Promise<Item> => {
+    const response = await axios.put(`${API_URL}/api/items/${id}`, item, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Eliminar un item
+  deleteItem: async (id: number, token: string): Promise<void> => {
+    await axios.delete(`${API_URL}/api/items/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },

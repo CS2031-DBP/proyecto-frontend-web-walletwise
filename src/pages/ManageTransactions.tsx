@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import { useNavigate } from "react-router-dom";
 import { api, CategoriaDto, Account } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
@@ -34,7 +34,7 @@ function ManageTransactions() {
   const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useToken();
-  const navigate = useNavigate(); // Instanciar useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTransactions(0);
@@ -129,7 +129,7 @@ function ManageTransactions() {
           <Button label="Volver al Dashboard" onClick={() => navigate("/dashboard")} type="secondary" />
         </div>
       </div>
-  
+
       {/* Lista de transacciones */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {transactions.map((transaction) => (
@@ -141,11 +141,16 @@ function ManageTransactions() {
             <div className="flex justify-between mt-4">
               <Button label="Editar" onClick={() => openModal(transaction)} type="primary" />
               <Button label="Eliminar" onClick={() => handleDelete(transaction.id!)} type="danger" />
+              <Button
+                label="Items"
+                onClick={() => navigate(`/manage-items/${transaction.id}`)}
+                type="secondary"
+              />
             </div>
           </div>
         ))}
       </div>
-  
+
       {/* Paginación */}
       <div className="flex justify-center space-x-4 mt-6">
         <Button
@@ -161,7 +166,7 @@ function ManageTransactions() {
           disabled={pagination.currentPage + 1 >= pagination.totalPages}
         />
       </div>
-  
+
       {/* Modal para crear/editar transacción */}
       {isModalOpen && currentTransaction && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -239,7 +244,6 @@ function ManageTransactions() {
       )}
     </div>
   );
-  
 }
 
 export default ManageTransactions;

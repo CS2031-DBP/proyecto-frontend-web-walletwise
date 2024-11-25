@@ -9,6 +9,7 @@ import EditAccount from "./pages/EditAccount"; // Importar la página de edició
 import ManageSubcategories from "./pages/ManageSubcategories";
 import ManageBudgets from "./pages/ManageBudgets";
 import ManageTransactions from "./pages/ManageTransactions";
+import ManageItems from "./pages/ManageItems";
 function App() {
   return (
     <BrowserRouter>
@@ -38,6 +39,9 @@ function App() {
         <Route path="/budgets" element={<ManageBudgets />} />
 
         <Route path="/manage-transactions" element={<ManageTransactions />} />
+
+        <Route path="/manage-items/:transaccionId" element={<ManageItems />} />
+
 
 
       </Routes>
