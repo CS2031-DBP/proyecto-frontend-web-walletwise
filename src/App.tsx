@@ -42,8 +42,6 @@ function App() {
 
         <Route path="/manage-items/:transaccionId" element={<ManageItems />} />
 
-
-
       </Routes>
     </BrowserRouter>
   );

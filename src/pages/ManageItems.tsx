@@ -1,28 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api, Item } from "../services/api";
+import { api, Item, Transaction } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
 
 function ManageItems() {
   const { transaccionId } = useParams<{ transaccionId: string }>();
   const [items, setItems] = useState<Item[]>([]);
+  const [transaction, setTransaction] = useState<Transaction | null>(null); // Estado para los datos de la transacción
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useToken();
   const navigate = useNavigate();
 
+  // Cargar datos de la transacción y sus items al montar
   useEffect(() => {
-    fetchItems();
+    fetchTransactionDetails();
   }, [transaccionId]);
 
-  async function fetchItems() {
+  async function fetchTransactionDetails() {
     try {
       if (!transaccionId) return;
-      const data = await api.getItems(token || "", parseInt(transaccionId));
-      setItems(data);
+
+      // Cargar los detalles de la transacción
+      const transactionData = await api.getTransactions(token || "", 0);
+      const currentTransaction = transactionData.transacciones.find(
+        (t) => t.id === parseInt(transaccionId)
+      );
+      setTransaction(currentTransaction || null);
+
+      // Cargar los items asociados a la transacción
+      const itemsData = await api.getItems(token || "", parseInt(transaccionId));
+      setItems(itemsData);
     } catch (error) {
-      console.error("Error al obtener items:", error);
+      console.error("Error al obtener datos de la transacción o items:", error);
     }
   }
 
@@ -61,7 +72,7 @@ function ManageItems() {
         alert("Item creado.");
       }
       closeModal();
-      fetchItems();
+      fetchTransactionDetails();
     } catch (error) {
       console.error("Error al guardar el item:", error);
       alert("No se pudo guardar el item.");
@@ -72,7 +83,7 @@ function ManageItems() {
     try {
       await api.deleteItem(id, token || "");
       alert("Item eliminado.");
-      fetchItems();
+      fetchTransactionDetails();
     } catch (error) {
       console.error("Error al eliminar el item:", error);
       alert("No se pudo eliminar el item.");
@@ -82,7 +93,9 @@ function ManageItems() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
-        <h1 className="text-3xl font-bold text-blue-600">Gestión de Items</h1>
+        <h1 className="text-3xl font-bold text-blue-600">
+          {transaction ? transaction.destinatario : "Cargando transacción..."}
+        </h1>
         <div className="flex space-x-4">
           <Button label="Nuevo Item" onClick={() => openModal()} type="primary" />
           <Button label="Volver" onClick={() => navigate(-1)} type="secondary" />
