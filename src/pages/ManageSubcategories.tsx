@@ -2,27 +2,33 @@ import React, { useState, useEffect } from "react";
 import { api, SubcategoriaDto, CategoriaDto } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
+import Card from "../components/Card";
+import Modal from "../components/Modal";
+import InputField from "../components/InputField";
+import TextArea from "../components/TextArea";
+import Select from "../components/Select";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 
 function ManageSubcategories() {
   const [subcategories, setSubcategories] = useState<SubcategoriaDto[]>([]);
-  const [categories, setCategories] = useState<CategoriaDto[]>([]); // Lista de categorías dinámicas
+  const [categories, setCategories] = useState<CategoriaDto[]>([]);
   const [currentSubcategory, setCurrentSubcategory] = useState<SubcategoriaDto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subcategoryToDelete, setSubcategoryToDelete] = useState<SubcategoriaDto | null>(null);
   const { token } = useToken();
   const navigate = useNavigate();
 
-  // Cargar subcategorías y categorías al iniciar
   useEffect(() => {
     async function fetchData() {
       try {
         const [subcategoriesData, categoriesData] = await Promise.all([
           api.getSubcategories(token || ""),
-          api.getCategories(token || ""), // Obtener categorías desde el backend
+          api.getCategories(token || ""),
         ]);
         setSubcategories(subcategoriesData);
-        setCategories(categoriesData); // Guardar categorías dinámicas
+        setCategories(categoriesData);
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -80,137 +86,126 @@ function ManageSubcategories() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-blue-100 py-4 px-6 rounded-lg shadow-md mb-6">
-        <h1 className="text-3xl font-bold text-blue-600">Gestión de Subcategorías</h1>
-        <div className="flex space-x-4">
-          <Button
-            label="Nueva Subcategoría"
-            onClick={() => openModal()}
-            type="primary"
-            className="flex items-center space-x-2"
-          >
-            <span>➕</span>
-            <span>Nuevo</span>
-          </Button>
-          <Button
-            label="Volver al Dashboard"
-            onClick={() => navigate("/dashboard")}
-            type="secondary"
-            className="flex items-center space-x-2"
-          >
-            <span>🏠</span>
-            <span>Dashboard</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Lista de Subcategorías */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {subcategories.map((subcategory) => (
-          <div
-            key={subcategory.id}
-            className="p-6 bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
-          >
-            <h3 className="text-xl font-bold text-blue-600 mb-2">{subcategory.nombre}</h3>
-            <p className="text-gray-700 mb-2">{subcategory.descripcion}</p>
-            <p className="text-gray-500">
-              <span className="font-semibold">Categoría:</span> {subcategory.categoriaNombre || "Sin categoría"}
-            </p>
-            <div className="flex justify-between mt-4">
-              <Button
-                label="Editar"
-                onClick={() => openModal(subcategory)}
-                type="primary"
-                className="px-4"
-              />
-              <Button
-                label="Eliminar"
-                onClick={() => setSubcategoryToDelete(subcategory)}
-                type="danger"
-                className="px-4"
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal para Crear/Editar */}
-      {isModalOpen && currentSubcategory && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-2xl font-bold mb-4 text-blue-600">
-              {currentSubcategory.id ? "Editar Subcategoría" : "Nueva Subcategoría"}
-            </h2>
-            <input
-              name="nombre"
-              value={currentSubcategory.nombre}
-              onChange={handleInputChange}
-              placeholder="Nombre"
-              className="w-full p-3 border rounded-lg mb-4"
-            />
-            <textarea
-              name="descripcion"
-              value={currentSubcategory.descripcion}
-              onChange={handleInputChange}
-              placeholder="Descripción"
-              className="w-full p-3 border rounded-lg mb-4"
-            />
-            <select
-              name="categoriaId"
-              value={currentSubcategory.categoriaId}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg mb-4"
-            >
-              <option value="" disabled>
-                Selecciona una categoría
-              </option>
-              {categories.map((category) => (
-                <option key={category.nombre} value={category.id}>
-                  {category.nombre}
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-end space-x-4">
-              <Button label="Cancelar" onClick={closeModal} type="secondary" />
-              <Button
-                label={currentSubcategory.id ? "Guardar Cambios" : "Crear"}
-                onClick={handleSave}
-                type="primary"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Confirmación de Eliminación */}
-      {subcategoryToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-            <h2 className="text-lg font-bold text-center mb-4">
-              ¿Eliminar Subcategoría?
-            </h2>
-            <p className="text-center mb-6">
-              ¿Estás seguro de que deseas eliminar la subcategoría{" "}
-              <span className="font-semibold">{subcategoryToDelete.nombre}</span>?
-            </p>
-            <div className="flex justify-around">
-              <Button
-                label="Cancelar"
-                onClick={() => setSubcategoryToDelete(null)}
-                type="secondary"
-              />
-              <Button
-                label="Eliminar"
-                onClick={handleDelete}
-                type="danger"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="min-h-screen flex flex-col">
+  <Header title="Gestión de Subcategorías" />
+  <div className="flex-grow max-w-7xl mx-auto p-6">
+    {/* Botones de acción centrados */}
+    <div className="flex justify-center space-x-4 mb-6">
+      <Button
+        label="Nueva Subcategoría"
+        onClick={() => openModal()}
+        type="primary"
+      />
+      <Button
+        label="Volver al Dashboard"
+        onClick={() => navigate("/dashboard")}
+        type="secondary"
+      />
     </div>
+
+    {/* Lista de Subcategorías */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {subcategories.map((subcategory) => (
+        <div
+          key={subcategory.id}
+          className="p-6 bg-white border rounded-lg shadow-md hover:shadow-lg transition-shadow min-h-[180px] flex flex-col justify-between"
+        >
+          <div>
+            <h3 className="text-2xl font-bold text-blue-600">
+              {subcategory.nombre}
+            </h3>
+            <p className="text-gray-700 mt-2">{subcategory.descripcion}</p>
+            <p className="text-gray-500 mt-1">
+              <span className="font-semibold">Categoría:</span>{" "}
+              {subcategory.categoriaNombre || "Sin categoría"}
+            </p>
+          </div>
+          <div className="flex justify-end mt-4 space-x-4">
+            <Button
+              label="Editar"
+              onClick={() => openModal(subcategory)}
+              type="primary"
+            />
+            <Button
+              label="Eliminar"
+              onClick={() => setSubcategoryToDelete(subcategory)}
+              type="danger"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Modal para Crear/Editar */}
+    {isModalOpen && currentSubcategory && (
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={
+          currentSubcategory.id ? "Editar Subcategoría" : "Nueva Subcategoría"
+        }
+      >
+        <InputField
+          name="nombre"
+          value={currentSubcategory.nombre}
+          onChange={handleInputChange}
+          placeholder="Nombre"
+        />
+        <TextArea
+          name="descripcion"
+          value={currentSubcategory.descripcion}
+          onChange={handleInputChange}
+          placeholder="Descripción"
+        />
+        <Select
+          name="categoriaId"
+          value={currentSubcategory.categoriaId}
+          onChange={handleInputChange}
+          options={[
+            { value: "", label: "Selecciona una categoría" },
+            ...categories.map((category) => ({
+              value: category.id!,
+              label: category.nombre,
+            })),
+          ]}
+        />
+        <div className="flex justify-between mt-4">
+          <Button label="Cancelar" onClick={closeModal} type="secondary" />
+          <Button
+            label={
+              currentSubcategory.id ? "Guardar Cambios" : "Crear Subcategoría"
+            }
+            onClick={handleSave}
+            type="primary"
+          />
+        </div>
+      </Modal>
+    )}
+
+    {/* Confirmación de Eliminación */}
+    {subcategoryToDelete && (
+      <Modal
+        isOpen={!!subcategoryToDelete}
+        onClose={() => setSubcategoryToDelete(null)}
+      >
+        <p className="text-center mb-6">
+          ¿Estás seguro de que deseas eliminar la subcategoría{" "}
+          <span className="font-semibold">{subcategoryToDelete.nombre}</span>?
+        </p>
+        <div className="flex justify-around">
+          <Button
+            label="Cancelar"
+            onClick={() => setSubcategoryToDelete(null)}
+            type="secondary"
+          />
+          <Button label="Eliminar" onClick={handleDelete} type="danger" />
+        </div>
+      </Modal>
+    )}
+  </div>
+  <Footer />
+</div>
+
   );
 }
 
