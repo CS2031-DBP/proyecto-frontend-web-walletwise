@@ -11,6 +11,7 @@ import ManageBudgets from "./pages/ManageBudgets";
 import ManageTransactions from "./pages/ManageTransactions";
 import ManageItems from "./pages/ManageItems";
 import ManageReports from "./pages/ManageReports";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
         <Route path="/manage-items/:transaccionId" element={<ManageItems />} />
 
         <Route path="/manage-reports" element={<ManageReports />} />
+
+        <Route path="/profile" element={<Profile />} />
 
 
       </Routes>
