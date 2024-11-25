@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api } from "../services/api";
+import { api, CategoriaDto, Account } from "../services/api";
 import useToken from "../hooks/useToken";
 import Button from "../components/Button";
 
@@ -28,12 +28,15 @@ function ManageTransactions() {
     totalPages: 0,
     currentPage: 0,
   });
+  const [accounts, setAccounts] = useState<Account[]>([]); // Lista de cuentas
+  const [categories, setCategories] = useState<CategoriaDto[]>([]); // Lista de categorías
   const [currentTransaction, setCurrentTransaction] = useState<Transaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useToken();
 
   useEffect(() => {
     fetchTransactions(0); // Cargar la primera página de transacciones al inicio
+    fetchAccountsAndCategories(); // Cargar cuentas y categorías
   }, [token]);
 
   async function fetchTransactions(page: number) {
@@ -43,6 +46,19 @@ function ManageTransactions() {
       setTransactions(data.transacciones);
     } catch (error) {
       console.error("Error al obtener transacciones:", error);
+    }
+  }
+
+  async function fetchAccountsAndCategories() {
+    try {
+      const [accountsData, categoriesData] = await Promise.all([
+        api.getAccounts(token || ""),
+        api.getCategories(token || ""),
+      ]);
+      setAccounts(accountsData);
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Error al cargar cuentas y categorías:", error);
     }
   }
 
@@ -178,22 +194,36 @@ function ManageTransactions() {
               <option value="GASTO">Gasto</option>
               <option value="INGRESO">Ingreso</option>
             </select>
-            <input
+            <select
               name="cuentaId"
-              type="number"
               value={currentTransaction.cuentaId}
               onChange={handleInputChange}
-              placeholder="ID de Cuenta"
               className="w-full p-3 border rounded-lg mb-4"
-            />
-            <input
+            >
+              <option value="0" disabled>
+                Selecciona una cuenta
+              </option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.nombre}
+                </option>
+              ))}
+            </select>
+            <select
               name="categoriaId"
-              type="number"
               value={currentTransaction.categoriaId}
               onChange={handleInputChange}
-              placeholder="ID de Categoría"
               className="w-full p-3 border rounded-lg mb-4"
-            />
+            >
+              <option value="0" disabled>
+                Selecciona una categoría
+              </option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.nombre}
+                </option>
+              ))}
+            </select>
             <div className="flex justify-between">
               <Button label="Cancelar" onClick={closeModal} type="secondary" />
               <Button label="Guardar" onClick={handleSave} type="primary" />
