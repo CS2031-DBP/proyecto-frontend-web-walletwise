@@ -33,7 +33,7 @@ function Home() {
           {/* Feature 2 */}
           <Card title="Presupuestos Personalizados">
             <img
-              src="https://cdn-icons-png.flaticon.com/512/2920/2920401.png"
+              src="https://static.vecteezy.com/system/resources/previews/012/872/167/original/brown-wallet-illustration-png.png"
               alt="Presupuestos personalizados"
               className="w-16 mx-auto mb-4"
             />
@@ -45,7 +45,7 @@ function Home() {
           {/* Feature 3 */}
           <Card title="Análisis Detallado">
             <img
-              src="https://media.discordapp.net/attachments/1278415903016489011/1310409478188961812/image-removebg-preview-71.png?format=webp&quality=lossless&width=1184&height=804"
+              src="https://static.vecteezy.com/system/resources/previews/029/238/069/original/illustration-graphic-cartoon-character-of-company-activity-report-vector.jpg"
               alt="Análisis detallado"
               className="w-16 mx-auto mb-4"
             />
