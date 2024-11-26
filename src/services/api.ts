@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = '/api';
+// Base URL de la API: utiliza la variable de entorno en producción o el proxy en desarrollo
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export interface LoginDto {
   email: string;
@@ -19,6 +20,7 @@ export interface AuthResponse {
   token: string;
   role: string;
 }
+
 export interface Account {
   id: number;
   nombre: string;
@@ -26,11 +28,12 @@ export interface Account {
   tipoCuenta: string;
   moneda: string;
 }
+
 export interface CategoriaDto {
-  id?: number; // Agrega esta línea para incluir el ID de la categoría
+  id?: number;
   nombre: string;
   descripcion: string;
-  tipo: "INGRESO" | "GASTO"; // Enum restringido
+  tipo: 'INGRESO' | 'GASTO';
 }
 
 export interface CreateAccountDto {
@@ -45,7 +48,7 @@ export interface SubcategoriaDto {
   nombre: string;
   descripcion: string;
   categoriaId: number;
-  categoriaNombre?: string; // Nuevo campo
+  categoriaNombre?: string;
 }
 
 export interface PresupuestoDto {
@@ -53,40 +56,39 @@ export interface PresupuestoDto {
   montoTotal: number;
   alerta: string;
   gastoActual: number;
-  periodo: "MENSUAL" | "ANUAL" | "SEMANAL";
+  periodo: 'MENSUAL' | 'ANUAL' | 'SEMANAL';
   categoriaId: number;
-  categoriaNombre?: string; // Este campo se agrega dinámicamente
+  categoriaNombre?: string;
 }
 
-// Transacciones
 export interface Transaction {
-  id?: number; // ID opcional para nuevas transacciones
+  id?: number;
   monto: number;
   destinatario: string;
-  fecha: string; // Fecha en formato "YYYY-MM-DD"
-  tipo: "GASTO" | "INGRESO"; // Gasto o ingreso
-  cuentaId: number; // ID de la cuenta asociada
-  categoriaId: number; // ID de la categoría asociada
+  fecha: string;
+  tipo: 'GASTO' | 'INGRESO';
+  cuentaId: number;
+  categoriaId: number;
 }
 
 export interface Item {
-  id?: number; // ID opcional para nuevos items
+  id?: number;
   nombre: string;
   precio: number;
   descripcion: string;
-  transaccionId: number; // ID de la transacción asociada
+  transaccionId: number;
 }
 
 export interface ReportDto {
-  fechaGeneracion?: string; // Se puede generar automáticamente en el backend
-  tipoReporte: "FINANCIERO" | "GASTOS" | "INGRESOS";
+  fechaGeneracion?: string;
+  tipoReporte: 'FINANCIERO' | 'GASTOS' | 'INGRESOS';
   fechaInicio: string;
   fechaFin: string;
-  formato: "JSON" | "PDF" | "CSV";
+  formato: 'JSON' | 'PDF' | 'CSV';
 }
 
-
 export const api = {
+  // Auth
   login: async (loginDto: LoginDto): Promise<AuthResponse> => {
     const response = await axios.post(`${API_URL}/auth/login`, loginDto);
     return response.data;
@@ -97,53 +99,51 @@ export const api = {
     return response.data;
   },
 
+  // Accounts
+  getAccounts: async (token: string) => {
+    const response = await axios.get(`${API_URL}/cuentas/miscuentas`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
 
-getAccounts: async (token: string) => {
-  console.log("Usando token para getAccounts:", token);
-  const response = await axios.get(`${API_URL}/api/cuentas/miscuentas`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
-},
-
-
-  // Eliminar cuenta
   deleteAccount: async (id: number, token: string) => {
-    await axios.delete(`${API_URL}/api/cuentas/${id}`, {
+    await axios.delete(`${API_URL}/cuentas/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
 
   createAccount: async (account: CreateAccountDto, token: string) => {
-    const response = await axios.post(`${API_URL}/api/cuentas`, account, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  },
-  updateAccount: async (id: number, account: CreateAccountDto, token: string) => {
-    const response = await axios.put(`${API_URL}/api/cuentas/${id}`, account, {
+    const response = await axios.post(`${API_URL}/cuentas`, account, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  /////
+  updateAccount: async (id: number, account: CreateAccountDto, token: string) => {
+    const response = await axios.put(`${API_URL}/cuentas/${id}`, account, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  },
+
+  // Categories
   getCategories: async (token: string) => {
-    const response = await axios.get(`${API_URL}/api/categorias`, {
+    const response = await axios.get(`${API_URL}/categorias`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   createCategory: async (category: CategoriaDto, token: string) => {
-    const response = await axios.post(`${API_URL}/api/categorias`, category, {
+    const response = await axios.post(`${API_URL}/categorias`, category, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   updateCategory: async (id: number, category: CategoriaDto, token: string) => {
-    const response = await axios.put(`${API_URL}/api/categorias/${id}`, category, {
+    const response = await axios.put(`${API_URL}/categorias/${id}`, category, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -151,175 +151,156 @@ getAccounts: async (token: string) => {
 
   deleteCategory: async (id: number, token: string) => {
     if (!id) {
-      throw new Error("El ID de la categoría es obligatorio para eliminar.");
+      throw new Error('El ID de la categoría es obligatorio para eliminar.');
     }
-    await axios.delete(`${API_URL}/api/categorias/${id}`, {
+    await axios.delete(`${API_URL}/categorias/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
-  
-  
-  ///////
 
-  // Crear subcategoría
+  // Subcategories
   createSubcategory: async (subcategory: SubcategoriaDto, token: string) => {
-    const response = await axios.post(`${API_URL}/api/subcategorias`, subcategory, {
+    const response = await axios.post(`${API_URL}/subcategorias`, subcategory, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Obtener todas las subcategorías
   getSubcategories: async (token: string): Promise<SubcategoriaDto[]> => {
-    const response = await axios.get(`${API_URL}/api/subcategorias`, {
+    const response = await axios.get(`${API_URL}/subcategorias`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Actualizar subcategoría
-  updateSubcategory: async (
-    id: number,
-    subcategory: SubcategoriaDto,
-    token: string
-  ) => {
-    const response = await axios.put(`${API_URL}/api/subcategorias/${id}`, subcategory, {
+  updateSubcategory: async (id: number, subcategory: SubcategoriaDto, token: string) => {
+    const response = await axios.put(`${API_URL}/subcategorias/${id}`, subcategory, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Eliminar subcategoría
   deleteSubcategory: async (id: number, token: string) => {
-    await axios.delete(`${API_URL}/api/subcategorias/${id}`, {
+    await axios.delete(`${API_URL}/subcategorias/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
 
-  /////
-
-
+  // Budgets
   getBudgets: async (token: string): Promise<PresupuestoDto[]> => {
-    const response = await axios.get(`${API_URL}/api/presupuestos/mispresupuestos`, {
+    const response = await axios.get(`${API_URL}/presupuestos/mispresupuestos`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   createBudget: async (budget: PresupuestoDto, token: string): Promise<PresupuestoDto> => {
-    const response = await axios.post(`${API_URL}/api/presupuestos`, budget, {
+    const response = await axios.post(`${API_URL}/presupuestos`, budget, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   updateBudget: async (id: number, budget: PresupuestoDto, token: string): Promise<PresupuestoDto> => {
-    const response = await axios.put(`${API_URL}/api/presupuestos/${id}`, budget, {
+    const response = await axios.put(`${API_URL}/presupuestos/${id}`, budget, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   deleteBudget: async (id: number, token: string): Promise<void> => {
-    await axios.delete(`${API_URL}/api/presupuestos/${id}`, {
+    await axios.delete(`${API_URL}/presupuestos/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
 
-   // Transacciones
-   getTransactions: async (token: string, page: number): Promise<{
+  // Transactions
+  getTransactions: async (token: string, page: number): Promise<{
     totalItems: number;
     transacciones: Transaction[];
     totalPages: number;
     currentPage: number;
   }> => {
-    const response = await axios.get(`${API_URL}/api/transacciones/mistransacciones?page=${page}`, {
+    const response = await axios.get(`${API_URL}/transacciones/mistransacciones?page=${page}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
-  
+
   getTransaction: async (token: string, id: number): Promise<Transaction> => {
-    const response = await axios.get(`${API_URL}/api/transacciones/${id}`, {
+    const response = await axios.get(`${API_URL}/transacciones/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
-  
 
   createTransaction: async (transaction: Transaction, token: string): Promise<Transaction> => {
-    const response = await axios.post(`${API_URL}/api/transacciones`, transaction, {
+    const response = await axios.post(`${API_URL}/transacciones`, transaction, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   updateTransaction: async (id: number, transaction: Transaction, token: string): Promise<Transaction> => {
-    const response = await axios.put(`${API_URL}/api/transacciones/${id}`, transaction, {
+    const response = await axios.put(`${API_URL}/transacciones/${id}`, transaction, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
   deleteTransaction: async (id: number, token: string): Promise<void> => {
-    await axios.delete(`${API_URL}/api/transacciones/${id}`, {
+    await axios.delete(`${API_URL}/transacciones/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
 
-   // Obtener items asociados a una transacción
-   getItems: async (token: string, transaccionId: number): Promise<Item[]> => {
-    const response = await axios.get(`${API_URL}/api/items?transaccionId=${transaccionId}`, {
+  // Items
+  getItems: async (token: string, transaccionId: number): Promise<Item[]> => {
+    const response = await axios.get(`${API_URL}/items?transaccionId=${transaccionId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Crear un nuevo item
   createItem: async (item: Item, token: string): Promise<Item> => {
-    const response = await axios.post(`${API_URL}/api/items`, item, {
+    const response = await axios.post(`${API_URL}/items`, item, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Actualizar un item existente
   updateItem: async (id: number, item: Item, token: string): Promise<Item> => {
-    const response = await axios.put(`${API_URL}/api/items/${id}`, item, {
+    const response = await axios.put(`${API_URL}/items/${id}`, item, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Eliminar un item
   deleteItem: async (id: number, token: string): Promise<void> => {
-    await axios.delete(`${API_URL}/api/items/${id}`, {
+    await axios.delete(`${API_URL}/items/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
 
-  // Crear un nuevo reporte
+  // Reports
   createReport: async (report: ReportDto, token: string) => {
-    const response = await axios.post(`${API_URL}/api/reportes`, report, {
+    const response = await axios.post(`${API_URL}/reportes`, report, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Obtener todos los reportes del usuario
   getReports: async (token: string) => {
-    const response = await axios.get(`${API_URL}/api/reportes/misreportes`, {
+    const response = await axios.get(`${API_URL}/reportes/misreportes`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
 
-  // Actualizar un reporte (dependiendo de los requisitos)
   updateReport: async (id: number, report: ReportDto, token: string) => {
-    const response = await axios.put(`${API_URL}/api/reportes/${id}`, report, {
+    const response = await axios.put(`${API_URL}/reportes/${id}`, report, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   },
-
 };
