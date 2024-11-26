@@ -75,6 +75,9 @@ La aplicación está estructurada en varias carpetas y archivos clave:
    ```
 
    La aplicación estará disponible en `http://localhost:3000`.
+5. **Configuración del backend:**
+
+El backend está configurado para correr en http://3.208.89.209:8080. Esta URL ya está incluida en el archivo vite.config.ts, donde se define el proxy para redirigir las solicitudes al backend.
 
 ## Descripción de Componentes y Páginas
 
