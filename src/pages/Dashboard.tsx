@@ -33,6 +33,7 @@ function Dashboard() {
   const { token } = useToken();
   const navigate = useNavigate();
 
+//Para realizar una acción secundaria al montar el componente, como verificar autenticación y cargar cuentas desde el backend.
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -41,8 +42,10 @@ function Dashboard() {
 
     async function fetchAccounts() {
       try {
+        //Porque necesitamos llamar a la API, lo cual es una operación asíncrona. Esto nos permite manejar respuestas o errores de manera ordenada con await.
         const data = await api.getAccounts(token);
         setAccounts(data);
+        //Actualiza el estado accounts con los datos obtenidos de la API para que las cuentas se muestren en la interfaz.
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           alert("Sesión expirada. Por favor inicia sesión de nuevo.");

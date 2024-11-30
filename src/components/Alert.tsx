@@ -1,9 +1,9 @@
 import React from "react";
-
 interface AlertProps {
   message: string;
   type?: "success" | "error" | "warning" | "info";
   onClose?: () => void;
+  //una funcion opcional que se ejecuta cuando se cierra la alerta
 }
 
 const Alert: React.FC<AlertProps> = ({ message, type = "info", onClose }) => {
